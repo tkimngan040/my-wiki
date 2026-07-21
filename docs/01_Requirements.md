@@ -1,6 +1,6 @@
 # 1. Yêu cầu chức năng (Functional Requirements)
 ## FR-01. Quản lý tài khoản
-- Hệ thống cho phép người dùng quản lý tài khoản cá nhân.
+Hệ thống cho phép người dùng quản lý tài khoản cá nhân.
 - Đăng ký tài khoản.
 - Đăng nhập.
 - Đăng xuất.
@@ -28,7 +28,7 @@ Hệ thống cho phép người dùng tạo và quản lý các Page trong Works
 - Đổi tên Page.
 - Xóa Page.
 - Di chuyển Page giữa các Folder.
-Lưu ý: Chức năng chỉnh sửa nội dung sẽ thuộc FR-05.
+- Lưu ý: Chức năng chỉnh sửa nội dung sẽ thuộc FR-05.
 
 ## FR-05. Chế độ chỉnh sửa (Edit Mode)
 Hệ thống cho phép chỉnh sửa nội dung của một Page.
