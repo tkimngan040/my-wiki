@@ -1,6 +1,7 @@
+**MyWiki - Version 1.0 MVP**
 # 1. Yêu cầu chức năng (Functional Requirements)
 ## FR-01. Quản lý tài khoản
-Hệ thống cho phép người dùng quản lý tài khoản cá nhân.
+Hệ thống cho phép người dùng quản lý tài khoản cá nhân, bao gồm:
 - Đăng ký tài khoản.
 - Đăng nhập.
 - Đăng xuất.
@@ -8,126 +9,80 @@ Hệ thống cho phép người dùng quản lý tài khoản cá nhân.
 - Đổi mật khẩu.
 
 ## FR-02. Quản lý Workspace
-Hệ thống cho phép người dùng tạo và quản lý nhiều không gian làm việc.
-- Tạo Workspace.
-- Đổi tên Workspace.
-- Xóa Workspace.
-- Chuyển đổi giữa các Workspace.
+- Mỗi Workspace là một không gian độc lập tách biệt khỏi các Workspace khác.
+- Bên trong Workspace có chứa các Folder và các Page.
+- Workspace có hai chế độ là công khai (Public) và riêng tư (Private), khi Workspace được đặt chế độ là công khai, tất cả mọi người đều đọc được thông tin trong Page trong Workspace đó. Ngược lại nếu Workspace được đặt là riêng tư thì chỉ người tạo ra Workspace đó mới đọc được.
+- Chỉ có chủ nhân của Workspace mới chỉnh sửa được chính Workspace đó.
+- Nội dung quản lý Workspace bao gồm thêm Workspace mới, đổi tên và xóa Workspace cũ. Khi xóa một Workspace thì tất cả các Folder và các Page có trong Workspace đó đều bị xóa.
+- Các Workspace của cùng một người dùng không thể có tên trùng nhau.
 
 ## FR-03. Quản lý Folder
-Hệ thống cho phép người dùng tổ chức dữ liệu trong Workspace theo cấu trúc thư mục.
-- Tạo Folder.
-- Đổi tên Folder.
-- Xóa Folder.
-- Di chuyển Folder.
-- Tạo Folder con (lồng nhau).
+- Folder được dùng để lưu trữ và phân loại các Page.
+- Một Folder có thể chứa nhiều Folder con.
+- Nội dung quản lý Folder bao gồm thêm Folder mới, đổi tên hoặc xóa Folder cũ. Khi xóa một Folder thì các Folder con và các Page có trong Folder đó đều bị xóa.
+- Các Folder có cùng cấp độ không thể có tên trùng nhau.
+- Các Folder con có thể di chuyển vào Folder cha bất kỳ, nhưng Folder cha không thể di chuyển vào Folder con của chính nó. Các Folder trong một Workspace không thể di chuyển qua một Workspace khác.
+- Khi Folder bị di chuyển thì các Folder con và các Page nằm trong Folder đó đều bị di chuyển theo.
 
 ## FR-04. Quản lý Page
-Hệ thống cho phép người dùng tạo và quản lý các Page trong Workspace. Mỗi Page là một đơn vị lưu trữ tri thức của hệ thống.
-- Tạo Page.
-- Đổi tên Page.
-- Xóa Page.
-- Di chuyển Page giữa các Folder.
+- Page là nơi chứa thông tin.
+- Page nằm trong Workspace hoặc nằm trong Folder thuộc Workspace.
+- Các Page có thể di chuyển bất kỳ trong Workspace. Các Page trong một Workspace không thể di chuyển qua một Workspace khác.
+- Nội dung chỉnh sửa Page bao gồm: thêm Page mới, sửa tên hoặc xóa Page cũ và chỉnh sửa thông tin trong Page. 
+- Khi người dùng click vào một liên kết trỏ đến Page đã bị xóa, hệ thống sẽ thông báo cho người dùng rằng Page không tồn tại.
+- Các Page trong cùng một Workspace không thể có tên trùng nhau (điều này để việc liên kết giữa các Page không xảy ra nhầm lẫn.)
 
-## FR-05. Chế độ chỉnh sửa (Edit Mode)
-Hệ thống cho phép chỉnh sửa nội dung của một Page.
-- Mở chế độ chỉnh sửa.
-- Chỉnh sửa nội dung.
-- Lưu thay đổi.
-- Hủy chỉnh sửa.
+## FR-05. Quản lý liên kết giữa các Page
+- Hai Page thuộc cùng một Workspace có thể liên kết với nhau. Ngược lại, hai Page thuộc hai Workspace khác nhau không thể liên kết với nhau.
+- Hai Page được liên kết với nhau thông qua tên Page, khi người xem click vào tên Page khác trong nội dung của một Page thì có thể mở xem Page khác đó.
+- Khi một trong hai Page có liên kết với nhau bị đổi tên, hệ thống sẽ tự động cập nhật từ khóa link sang tên mới
 
 ## FR-06. Chế độ xem (View Mode)
-Hệ thống cho phép người dùng xem nội dung của Page.
-- Hiển thị nội dung Page.
-- Điều hướng giữa các Page thông qua liên kết.
-- Chuyển sang chế độ chỉnh sửa.
-- Đây là chế độ mặc định của hệ thống.
+- Trong chế độ xem, người chưa đăng nhập có thể xem các Page trong các Workspace được đặt ở chế độ công khai, người đã đăng nhập có thể xem các Workspace ở chế độ công khai và các Workspace của chính mình.
+- Trong chế độ xem, người dùng chỉ có thể xem mà không thể chỉnh sửa. Người dùng cũng có thể click vào các từ khóa để mở các Page được liên kết với từ khóa đó để xem.
 
-## FR-07. Liên kết giữa các Page
-Hệ thống cho phép tạo mối liên kết giữa các Page.
-- Tạo liên kết đến Page khác.
-- Điều hướng sang Page được liên kết.
+## FR-07. Chế độ chỉnh sửa (Edit Mode)
+- Chỉ có người đã đăng nhập mới có thể chuyển qua chế độ chỉnh sửa.
+- Trong chế độ chỉnh sửa, người dùng có thể quản lý cả Workspace, Folder và Page, tạo và xóa liên kết giữa các Page.
 
 ## FR-08. Tìm kiếm
-Hệ thống cho phép tìm kiếm Page.
-- Tìm theo tiêu đề.
-- Tìm theo nội dung.
-- Hiển thị kết quả phù hợp.
+- Người dùng có thể tìm kiếm Workspace, Folder hoặc Page bằng từ khóa. Kết quả trả về dựa vào tên của Workspace/Folder/Page.
+- Hệ thống có phân loại dữ liệu thành Workspace, Folder và Page để hỗ trợ việc tìm kiếm. Sau khi người dùng nhập từ khóa để tìm kiếm, người dùng có thể bấm ô Workspace, Folder hoặc Page để xem kết quả tương ứng.
+- Người chưa đăng nhập chỉ tìm thấy dữ liệu trong Workspace Public, người đã đăng nhập sẽ tìm thấy dữ liệu từ Workspace Public và các Workspace do chính họ sở hữu.
 
-# 2. Yêu cầu phi chức năng (Non-functional Requirements)
+# 2. Yêu cầu phi chức năng (Non-Functional Requirements)
 ## NFR-01. Hiệu năng (Performance)
-Hệ thống cần đảm bảo khả năng phản hồi nhanh đối với các thao tác thông thường.
-- Thời gian phản hồi cho các thao tác cơ bản không vượt quá 2 giây trong điều kiện sử dụng thông thường.
-- Việc mở Page và chuyển đổi giữa các Page diễn ra mượt mà.
-- Kết quả tìm kiếm được trả về trong thời gian không vượt quá 2 giây đối với dữ liệu thông thường.
+- Hệ thống phải phản hồi các thao tác thông thường (đăng nhập, mở Page, tạo Page, đổi tên, tìm kiếm...) trong thời gian không quá 2 giây trong điều kiện hoạt động bình thường.
+- Hệ thống phải hỗ trợ tìm kiếm và hiển thị kết quả trong thời gian không quá 2 giây đối với dữ liệu của một người dùng.
 
 ## NFR-02. Bảo mật (Security)
-Hệ thống cần đảm bảo an toàn cho tài khoản và dữ liệu của người dùng.
-- Mật khẩu người dùng được lưu dưới dạng mã hóa.
-- Chỉ người đã đăng nhập mới được sử dụng hệ thống.
-- Hệ thống bảo vệ dữ liệu khỏi các truy cập không hợp lệ.
+- Mật khẩu người dùng phải được mã hóa (hash) trước khi lưu vào cơ sở dữ liệu.
+- Người dùng chỉ được truy cập và chỉnh sửa các Workspace mà họ có quyền.
+- Người chưa đăng nhập không được phép sử dụng các chức năng chỉnh sửa dữ liệu.
+- Phiên đăng nhập phải được xác thực bằng JWT hoặc Session.
 
 ## NFR-03. Khả năng sử dụng (Usability)
-Hệ thống cần có giao diện trực quan và dễ sử dụng.
-- Chế độ xem (View Mode) là chế độ mặc định.
-- Người dùng có thể chuyển sang chế độ chỉnh sửa (Edit Mode) khi cần.
-- Các thao tác tạo, sửa, xóa được thực hiện với số bước tối thiểu.
-- Giao diện thống nhất giữa các Workspace.
+- Giao diện phải thống nhất giữa các trang.
+- Người dùng có thể thực hiện các thao tác chính mà không cần tài liệu hướng dẫn.
 
-## NFR-04. Khả năng mở rộng (Scalability)
-Hệ thống được thiết kế để dễ dàng bổ sung chức năng trong tương lai.
-- Có thể bổ sung các module mới mà không ảnh hưởng đến các chức năng hiện có.
-- Có thể mở rộng số lượng Workspace, Folder và Page.
-- Kiến trúc hệ thống được thiết kế theo hướng dễ mở rộng và bổ sung chức năng trong các phiên bản tiếp theo.
+## NFR-04. Tính toàn vẹn dữ liệu (Data Integrity)
+- Dữ liệu phải luôn đảm bảo tính nhất quán sau các thao tác thêm, sửa, xóa.
+- Không được tồn tại Folder hoặc Page không thuộc Workspace nào.
+- Các ràng buộc duy nhất (Unique) của Workspace, Folder và Page phải luôn được đảm bảo.
 
-## NFR-05. Khả năng bảo trì (Maintainability)
-Hệ thống cần được xây dựng theo hướng dễ bảo trì và phát triển.
-- Mã nguồn được tổ chức theo kiến trúc thống nhất.
-- Các thành phần được phân tách rõ ràng theo chức năng.
-- Hệ thống dễ dàng bảo trì và mở rộng.
+## NFR-05. Khả năng mở rộng (Scalability)
+- Hệ thống phải được thiết kế theo kiến trúc module để có thể bổ sung các chức năng mới mà không ảnh hưởng đến các chức năng hiện có.
+- Cấu trúc cơ sở dữ liệu phải hỗ trợ mở rộng cho các phiên bản tiếp theo như Tag, Version History, Graph View hoặc Workspace chia sẻ.
 
-# 3. Quy tắc hệ thống (System Rules)
-Các quy tắc dưới đây là nền tảng trong thiết kế và vận hành của MyWiki. Mọi chức năng của hệ thống cần tuân thủ các quy tắc này.
+## NFR-06. Khả năng bảo trì (Maintainability)
+- Mã nguồn phải được tổ chức theo kiến trúc rõ ràng, tách biệt giữa giao diện, xử lý nghiệp vụ và truy cập dữ liệu.
+- Mã nguồn phải tuân theo quy tắc đặt tên thống nhất và dễ đọc.
+- Các thành phần của hệ thống phải có khả năng tái sử dụng khi phù hợp.
 
-## SR-01. Workspace là không gian làm việc độc lập
-- Mỗi Workspace là một không gian làm việc riêng biệt.
-- Dữ liệu giữa các Workspace được tách biệt hoàn toàn.
-- Người dùng có thể tạo nhiều Workspace để quản lý các lĩnh vực khác nhau.
+## NFR-07. Khả năng tương thích (Compatibility)
+- Hệ thống phải hoạt động trên các trình duyệt phổ biến như Google Chrome, Microsoft Edge và Mozilla Firefox.
+- Giao diện phải hiển thị chính xác trên màn hình máy tính để bàn.
 
-## SR-02. Cấu trúc tổ chức dữ liệu
-Dữ liệu trong hệ thống được tổ chức theo cấu trúc phân cấp gồm Workspace, Folder và Page.
-- Workspace là cấp cao nhất và là không gian làm việc độc lập.
-- Workspace có thể chứa trực tiếp các Page hoặc các Folder.
-- Folder có thể chứa các Page, Folder con hoặc cả hai.
-- Page là đơn vị lưu trữ tri thức của hệ thống.
-
-## SR-03. Mỗi Page chỉ thuộc một Workspace
-- Một Page chỉ được phép thuộc về duy nhất một Workspace.
-- Một Page có thể được di chuyển giữa các Folder trong cùng Workspace.
-- Không cho phép di chuyển Page sang Workspace khác.
-
-## SR-04. Mỗi Folder chỉ thuộc một Workspace
-- Một Folder chỉ thuộc duy nhất một Workspace.
-- Folder có thể chứa nhiều Folder con.
-- Folder con luôn thuộc cùng Workspace với Folder cha.
-
-## SR-05. Liên kết giữa các Page
-- Một Page có thể liên kết đến nhiều Page khác.
-- Một Page có thể được nhiều Page khác liên kết tới.
-- Chỉ cho phép tạo liên kết giữa các Page trong cùng một Workspace.
-
-## SR-06. Chế độ xem và chỉnh sửa
-- View Mode là chế độ mặc định khi mở một Page.
-- Người dùng chỉ chỉnh sửa nội dung khi chuyển sang Edit Mode.
-- Sau khi lưu hoặc hủy chỉnh sửa, hệ thống quay lại View Mode.
-
-## SR-07. Tổ chức dữ liệu
-- Folder không lưu trữ nội dung tri thức.
-- Nội dung tri thức chỉ được lưu trong Page.
-- Việc thay đổi vị trí của Page hoặc Folder không làm thay đổi nội dung của Page.
-
-## SR-08. Tên Page
-- Trong cùng một Workspace, tên của các Page phải là duy nhất.
-
-## SR-09. Tên Folder
-- Trong cùng một Folder cha, tên của các Folder con phải là duy nhất.
+## NFR-08. Khả năng tin cậy (Reliability)
+- Hệ thống phải đảm bảo dữ liệu đã lưu không bị mất sau khi người dùng hoàn thành thao tác lưu.
+- Khi xảy ra lỗi, hệ thống phải hiển thị thông báo phù hợp và không làm hỏng dữ liệu hiện có.
