@@ -32,7 +32,7 @@
 ## FR-05. Quản lý liên kết giữa các Page
 - Hai Page thuộc cùng một Workspace có thể liên kết với nhau. Ngược lại, hai Page thuộc hai Workspace khác nhau không thể liên kết với nhau.
 - Hai Page được liên kết với nhau thông qua tên Page, khi người xem click vào tên Page khác trong nội dung của một Page thì có thể mở xem Page khác đó.
-- Khi một trong hai Page có liên kết với nhau bị đổi tên, hệ thống sẽ tự động cập nhật từ khóa link sang tên mới
+- Khi một trong hai Page có liên kết với nhau bị đổi tên, hệ thống sẽ tự động cập nhật từ khóa link sang tên mới.
 
 ## FR-06. Chế độ xem (View Mode)
 - Trong chế độ xem, người chưa đăng nhập có thể xem các Page trong các Workspace được đặt ở chế độ công khai, người đã đăng nhập có thể xem các Workspace ở chế độ công khai và các Workspace của chính mình.
