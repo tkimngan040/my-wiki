@@ -1,12 +1,9 @@
 **MyWiki - Version 1.0 MVP**
 # 1. Yêu cầu chức năng (Functional Requirements)
 ## FR-01. Quản lý tài khoản
-Hệ thống cho phép người dùng quản lý tài khoản cá nhân, bao gồm:
-- Đăng ký tài khoản.
-- Đăng nhập.
-- Đăng xuất.
-- Cập nhật thông tin cá nhân.
-- Đổi mật khẩu.
+- Hệ thống cho phép: Đăng ký tài khoản mới, đăng nhập, đăng xuất, chỉnh sửa thông tin tài khoản, đổi mật khẩu tài khoản.
+- Mỗi gmail chỉ có thể tạo một tài khoản duy nhất.
+- ID người dùng là duy nhất.
 
 ## FR-02. Quản lý Workspace
 - Mỗi Workspace là một không gian độc lập tách biệt khỏi các Workspace khác.
