@@ -5,10 +5,13 @@
 # 2. List of Use Case
 ## UC-01. Đăng ký tài khoản
 **Actors:** Guest  
+
 **Summary:** Cho phép khách tạo một tài khoản mới để sử dụng hệ thống.  
+
 **Pre-condition:**
 - Người dùng chưa đăng nhập.
 - Người dùng chưa có tài khoản với email đã đăng ký.  
+
 **Main Flow:**
 1. Người dùng chọn chức năng Đăng ký.
 2. Hệ thống hiển thị biểu mẫu đăng ký.
@@ -16,6 +19,7 @@
 4. Hệ thống kiểm tra tính hợp lệ của dữ liệu.
 5. Hệ thống lưu tài khoản mới.
 6. Hệ thống thông báo đăng ký thành công.  
+
 **Alternative Flow:**
 - Địa chỉ email đã được sử dụng để đăng ký tài khoản khác.
     1. Hệ thống hiển thị thông báo lỗi "Email đã được sử dụng".
@@ -29,6 +33,7 @@
 - Người dùng hủy thao tác đăng ký.
     1. Hệ thống hủy quá trình đăng ký.
     2. Không tạo tài khoản mới.  
+    
 **Post-condition:**
 - Một tài khoản mới được tạo trong hệ thống.
 
