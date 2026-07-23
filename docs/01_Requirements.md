@@ -9,7 +9,7 @@
 - Mỗi Workspace là một không gian độc lập tách biệt khỏi các Workspace khác.
 - Bên trong Workspace có chứa các Folder và các Page.
 - Workspace có hai chế độ là công khai (Public) và riêng tư (Private), khi Workspace được đặt chế độ là công khai, tất cả mọi người đều đọc được thông tin trong Page trong Workspace đó. Ngược lại nếu Workspace được đặt là riêng tư thì chỉ người tạo ra Workspace đó mới đọc được.
-- Chỉ có chủ nhân của Workspace mới chỉnh sửa được chính Workspace đó.
+- Chỉ chủ sở hữu Workspace mới được phép tạo, sửa, xóa Workspace và chỉnh sửa các Folder, Page thuộc Workspace đó.
 - Nội dung quản lý Workspace bao gồm thêm Workspace mới, đổi tên và xóa Workspace cũ. Khi xóa một Workspace thì tất cả các Folder và các Page có trong Workspace đó đều bị xóa.
 - Các Workspace của cùng một người dùng không thể có tên trùng nhau.
 
@@ -31,12 +31,14 @@
 
 ## FR-05. Quản lý liên kết giữa các Page
 - Hai Page thuộc cùng một Workspace có thể liên kết với nhau. Ngược lại, hai Page thuộc hai Workspace khác nhau không thể liên kết với nhau.
-- Hai Page được liên kết với nhau thông qua tên Page, khi người xem click vào tên Page khác trong nội dung của một Page thì có thể mở xem Page khác đó.
-- Khi một trong hai Page có liên kết với nhau bị đổi tên, hệ thống sẽ tự động cập nhật từ khóa link sang tên mới.
+- Người dùng có thể tạo liên kết từ một đoạn văn bản trong nội dung của một Page đến một Page khác trong cùng Workspace. Khi người dùng nhấp vào đoạn văn bản đã được liên kết, hệ thống sẽ mở Page tương ứng.
+- Khi một Page bị đổi tên, các liên kết đến Page đó vẫn hoạt động bình thường.
+- Đoạn văn bản đã được liên kết phải có dấu hiệu trực quan để người dùng nhận biết và có thể nhấp để mở Page tương ứng.
 
 ## FR-06. Chế độ xem (View Mode)
 - Trong chế độ xem, người chưa đăng nhập có thể xem các Page trong các Workspace được đặt ở chế độ công khai, người đã đăng nhập có thể xem các Workspace ở chế độ công khai và các Workspace của chính mình.
-- Trong chế độ xem, người dùng chỉ có thể xem mà không thể chỉnh sửa. Người dùng cũng có thể click vào các từ khóa để mở các Page được liên kết với từ khóa đó để xem.
+- Hệ thống có khu vực riêng để hiển thị các Workspace của người dùng, người dùng chỉ có thể chuyển sang Edit Mode đối với các Workspace thuộc khu vực này.
+- Trong chế độ xem, người dùng chỉ có thể xem mà không thể chỉnh sửa. Người dùng cũng có thể click vào các đoạn văn bản có liên kết để mở các Page được liên kết với đoạn văn bản đó để xem.
 
 ## FR-07. Chế độ chỉnh sửa (Edit Mode)
 - Chỉ có người đã đăng nhập mới có thể chuyển qua chế độ chỉnh sửa.
