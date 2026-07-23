@@ -942,3 +942,6 @@
 
 **Post-condition:**
 - Danh sách Page phù hợp với từ khóa được hiển thị theo quyền truy cập của người dùng.
+
+# 3. Use Case Diagram
+![alt text](use_case_diagram_mywiki.jpg)
