@@ -5,5 +5,5 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 
 - Xây dựng một hệ thống quản lý tri thức cá nhân.
 - Hỗ trợ quản lý ghi chú, tài liệu và ý tưởng.
-- Hỗ trợ xây dựng thế giới truyện (Worldbuilding) cho tiểu thuyết.
+- Hỗ trợ lưu trữ thế giới truyện (Worldbuilding) cho tiểu thuyết.
 - Là dự án học tập và nghiên cứu về phát triển Backend.
