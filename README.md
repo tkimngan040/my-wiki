@@ -17,6 +17,8 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 - Mô hình Kiến trúc Mã nguồn là: mô hình Modular Monolith
 
 ## Cấu trúc thư mục
+
+```text
 my-wiki/
 │
 ├── docs/
@@ -30,3 +32,4 @@ my-wiki/
 ├── .gitignore
 ├── LICENSE
 └── README.md
+```
