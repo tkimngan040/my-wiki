@@ -13,15 +13,15 @@ my-wiki/
 │   └── 03_Project Structure.md
 │
 ├── src/
-|   ├── Auth
-|   ├── User
-|   ├── Workspace
-|   ├── Folder
-|   ├── Page
-|   ├── Link
-|   ├── Search
-|   ├── Permission (Access Control)
-|   └── Shared (Common)
+|   ├── 01_Auth
+|   ├── 02_User
+|   ├── 03_Workspace
+|   ├── 04_Folder
+|   ├── 05_Page
+|   ├── 06_Link
+|   ├── 07_Search
+|   ├── 08_Permission
+|   └── 09_Shared
 │
 ├── .gitignore
 ├── LICENSE
