@@ -14,7 +14,7 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 
 ## Ngôn ngữ sử dụng & Kiến trúc mã nguồn
 - Dự án sử dụng ngôn ngữ lập trình chính là: Java.
-- Mô hình Kiến trúc Mã nguồn là: mô hình Modular Monolith
+- Mô hình Kiến trúc Mã nguồn là: Modular Monolith
 
 ## Cấu trúc thư mục
 
@@ -28,6 +28,15 @@ my-wiki/
 │   └── 03_Project Structure.md
 │
 ├── src/
+|   ├── Auth
+|   ├── User
+|   ├── Workspace
+|   ├── Folder
+|   ├── Page
+|   ├── Link
+|   ├── Search
+|   ├── Permission (Access Control)
+|   └── Shared (Common)
 │
 ├── .gitignore
 ├── LICENSE
