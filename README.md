@@ -12,9 +12,12 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 - Người viết truyện và xây dựng thế giới truyện.
 - Sinh viên và người học muốn tổ chức tài liệu.
 
-## Ngôn ngữ sử dụng & Kiến trúc mã nguồn
-- Dự án sử dụng ngôn ngữ lập trình chính là: Java.
-- Mô hình Kiến trúc Mã nguồn là: Modular Monolith
+## Xây dựng hệ thống
+- Ngôn ngữ lập trình: Java
+- Framework: Spring Boot
+- Cơ sở dữ liệu: SQL Server
+- Kiến trúc mã nguồn: mô hình Layered Architecture (Controller – Service – Repository)
+
 
 ## Cấu trúc thư mục
 
@@ -22,23 +25,50 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 my-wiki/
 │
 ├── docs/
+│   ├── images_Diagram/
 │   ├── 00_Overview.md
 │   ├── 01_Requirements.md
-│   └── 02_System Analysis.md
+│   ├── 02_System Analysis.md
 │   └── 03_Project Structure.md
 │
 ├── src/
-|   ├── Auth
-|   ├── User
-|   ├── Workspace
-|   ├── Folder
-|   ├── Page
-|   ├── Link
-|   ├── Search
-|   ├── Permission (Access Control)
-|   └── Shared (Common)
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── mywiki/
+│   │   │           ├── config/
+│   │   │           ├── controller/
+│   │   │           ├── service/
+│   │   │           ├── repository/
+│   │   │           ├── entity/
+│   │   │           ├── dto/
+│   │   │           ├── exception/
+│   │   │           ├── util/
+│   │   │           └── MyWikiApplication.java
+│   │   │
+│   │   └── resources/
+│   │       └── application.properties
+│   │
+│   └── test/
 │
-├── .gitignore
-├── LICENSE
+├── pom.xml
 └── README.md
 ```
+
+## Prerequisites
+
+- JDK 21
+- Maven 3.9+
+- SQL Server 2022 
+- VS Code hoặc IntelliJ IDEA (khuyến nghị)
+
+## Clone project
+```text
+https://github.com/tkimngan040/my-wiki.git
+```
+
+## Configure database
+
+
+## Run project
+
