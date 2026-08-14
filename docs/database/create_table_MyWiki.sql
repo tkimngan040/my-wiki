@@ -217,3 +217,11 @@ ON Links(SourcePageId);
 CREATE INDEX IX_Links_TargetPageId
 ON Links(TargetPageId);
 GO
+
+ALTER TABLE dbo.Users
+    ADD AvatarUrl VARCHAR(500) NULL;
+GO
+
+ALTER TABLE dbo.Users
+    ADD DateOfBirth DATE NULL,
+    Bio VARCHAR(500) NULL;

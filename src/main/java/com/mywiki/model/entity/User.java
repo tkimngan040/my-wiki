@@ -3,6 +3,7 @@ package com.mywiki.model.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(
@@ -35,6 +36,15 @@ public class User {
 
     @Column(name = "UpdatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "AvatarUrl", length = 500)
+    private String avatarUrl;
+
+    @Column(name = "DateOfBirth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "Bio", length = 500)
+    private String bio;
 
     public User() {
     }
@@ -110,4 +120,16 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getAvatarUrl() { return avatarUrl; }
+
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public LocalDate getDateOfBirth() { return dateOfBirth; }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
+    public String getBio() { return bio; }
+
+    public void setBio(String bio) { this.bio = bio; }
 }
