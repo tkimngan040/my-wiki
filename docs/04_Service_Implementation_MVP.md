@@ -12,10 +12,8 @@ register()
 
 
 login()
-    ├── nhận email/ID + password
-    ├── tìm User
-    │      ├── bằng email
-    │      └── hoặc bằng ID
+    ├── nhận email + password
+    ├── tìm User bằng email
     ├── xác thực password
     ├── tạo Session/JWT
     └── trả kết quả đăng nhập
