@@ -15,8 +15,7 @@ Mục tiêu dài hạn của MyWiki là trở thành một không gian giúp ng�
   - Tác giả tiểu thuyết.
   - Những người sáng tác nội dung hư cấu có nhu cầu lưu trữ và quản lý lượng lớn thông tin liên quan đến các tác phẩm.
 - Đối tượng sử dụng mở rộng:
-  - Người chơi.
-  - Nhà phát triển game cần xây dựng game lore và worldbuilding.
+  - Người chơi, nhà phát triển game cần xây dựng game lore và worldbuilding.
   - Nhóm sáng tác cần cộng tác và chia sẻ tài liệu.
   - Người dùng muốn xây dựng personal knowledge base có tính liên kết cao.
 
