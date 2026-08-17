@@ -1,16 +1,24 @@
 # MyWiki
-MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển nhằm hỗ trợ người dùng lưu trữ, tổ chức và liên kết thông tin một cách hiệu quả. Hệ thống hướng đến việc xây dựng một không gian làm việc linh hoạt, nơi người dùng có thể quản lý ghi chú, tài liệu, ý tưởng và thế giới truyện trong cùng một nền tảng.
+MyWiki được phát triển nhằm hỗ trợ tổ chức, lưu trữ và quản lý các ý tưởng, thông tin và nội dung phục vụ quá trình sáng tác tiểu thuyết, đặc biệt là việc xây dựng thế giới (Worldbuilding).
 
 ## Mục tiêu
-- Xây dựng một hệ thống quản lý tri thức cá nhân.
-- Hỗ trợ quản lý ghi chú, tài liệu và ý tưởng.
-- Hỗ trợ lưu trữ thế giới truyện (Worldbuilding) cho tiểu thuyết.
-- Là dự án học tập và nghiên cứu về phát triển Backend.
+Hệ thống cho phép người dùng:
+- Tạo và quản lý nhiều thế giới độc lập.
+- Tổ chức thông tin trong mỗi thế giới thông qua Folder, Page.
+- Liên kết các Page với nhau để hình thành mạng lưới tri thức, giúp người dùng dễ dàng tra cứu và khám phá mối quan hệ giữa các thông tin.
+- Quản lý quyền truy cập với các mức Private và Public.
+Mục tiêu dài hạn của MyWiki là trở thành một không gian giúp người sáng tác không chỉ lưu trữ ý tưởng mà còn xây dựng và duy trì một hệ thống thế giới có cấu trúc, liên kết và dễ dàng mở rộng theo thời gian.
 
 ## Đối tượng sử dụng
-- Cá nhân có nhu cầu ghi chú và quản lý tri thức.
-- Người viết truyện và xây dựng thế giới truyện.
-- Sinh viên và người học muốn tổ chức tài liệu.
+- Đối tượng sử dụng chính: 
+  - Nhà văn.
+  - Tác giả tiểu thuyết.
+  - Những người sáng tác nội dung hư cấu có nhu cầu lưu trữ và quản lý lượng lớn thông tin liên quan đến các tác phẩm.
+- Đối tượng sử dụng mở rộng:
+  - Người chơi.
+  - Nhà phát triển game cần xây dựng game lore và worldbuilding.
+  - Nhóm sáng tác cần cộng tác và chia sẻ tài liệu.
+  - Người dùng muốn xây dựng personal knowledge base có tính liên kết cao.
 
 ## Xây dựng hệ thống
 - Ngôn ngữ lập trình: Java
@@ -23,35 +31,7 @@ MyWiki là hệ thống quản lý tri thức cá nhân, được phát triển 
 
 ```text
 my-wiki/
-│
-├── docs/
-│   ├── images_Diagram/
-│   ├── 00_Overview.md
-│   ├── 01_Requirements.md
-│   ├── 02_System Analysis.md
-│   └── 03_Project Structure.md
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── mywiki/
-│   │   │           ├── config/
-│   │   │           ├── controller/
-│   │   │           ├── service/
-│   │   │           ├── repository/
-│   │   │           ├── entity/
-│   │   │           ├── dto/
-│   │   │           ├── exception/
-│   │   │           ├── util/
-│   │   │           └── MyWikiApplication.java
-│   │   │
-│   │   └── resources/
-│   │       └── application.properties
-│   │
-│   └── test/
-│
-├── pom.xml
+|
 └── README.md
 ```
 
@@ -60,7 +40,7 @@ my-wiki/
 - JDK 21
 - Maven 3.9+
 - SQL Server 2022 
-- VS Code hoặc IntelliJ IDEA (khuyến nghị)
+- VS Code/IntelliJ IDEA 
 
 ## Clone project
 ```text
