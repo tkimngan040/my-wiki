@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import com.mywiki.model.dto.RegisterRequest;
 import com.mywiki.model.dto.LoginRequest;
 import com.mywiki.model.dto.UpdateAccountRequest;
+import com.mywiki.model.dto.ChangePasswordRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,7 +74,6 @@ class UserServiceImplTest {
         // Tạo User test
         String email = "test_login@mywiki.com";
         String password = "123456";
-
         String passwordHash = passwordEncoder.encode(password);
 
         User user = new User(
@@ -177,5 +177,70 @@ class UserServiceImplTest {
 
         // Xóa dữ liệu test
         userRepository.delete(updatedUser);
+    }
+
+    @Test
+    void changePassword_shouldWorkCorrectly() {
+
+        // ===== CASE 1: Đổi password thành công =====
+        User user = new User(
+                "ChangePasswordUser",
+                "test_change_password@mywiki.com",
+                passwordEncoder.encode("123456")
+        );
+
+        userRepository.save(user);
+
+        ChangePasswordRequest request = new ChangePasswordRequest(
+                "123456",
+                "654321",
+                "654321"
+        );
+
+        userService.changePassword(user.getUserId(), request);
+
+        User updatedUser = userRepository
+                .findById(user.getUserId())
+                .orElse(null);
+
+        assertNotNull(updatedUser);
+        assertTrue(
+                passwordEncoder.matches(
+                        "654321",
+                        updatedUser.getPasswordHash()
+                )
+        );
+
+        // ===== CASE 2: Password mới không khớp =====
+        ChangePasswordRequest mismatchRequest = new ChangePasswordRequest(
+                "654321",
+                "111111",
+                "222222"
+        );
+
+        assertThrows(
+                RuntimeException.class,
+                () -> userService.changePassword(
+                        user.getUserId(),
+                        mismatchRequest
+                )
+        );
+
+        // ===== CASE 3: Password hiện tại sai =====
+        ChangePasswordRequest wrongCurrentRequest = new ChangePasswordRequest(
+                "wrongpassword",
+                "111111",
+                "111111"
+        );
+
+        assertThrows(
+                RuntimeException.class,
+                () -> userService.changePassword(
+                        user.getUserId(),
+                        wrongCurrentRequest
+                )
+        );
+
+        userRepository.delete(user);
     }
 }
