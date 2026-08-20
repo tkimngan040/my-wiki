@@ -1,7 +1,5 @@
 package com.mywiki.service.impl;
 
-import com.mywiki.model.dto.LoginRequest;
-import com.mywiki.model.dto.RegisterRequest;
 import com.mywiki.model.dto.UpdateAccountRequest;
 import com.mywiki.model.dto.ChangePasswordRequest;
 
@@ -20,24 +18,6 @@ public class UserServiceImpl implements UserService {
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public void register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) // Kiểm tra email đã tồn tại chưa
-        {
-            throw new RuntimeException("Email already exists");
-        }
-        String passwordHash = passwordEncoder.encode(request.getPassword()); // Hash password
-        User user = new User(request.getUsername(), request.getEmail(), passwordHash);// Tạo User mới
-        userRepository.save(user); // Lưu User vào database
-    }
-
-    @Override
-    public boolean login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElse(null); // Tìm User bằng email
-        if (user == null) {return false;}// Không tìm thấy User
-        return passwordEncoder.matches(request.getPassword(), user.getPasswordHash()); // Kiểm tra password
     }
 
     @Override
