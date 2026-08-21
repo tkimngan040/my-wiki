@@ -73,6 +73,9 @@ CREATE TABLE Workspaces
         FOREIGN KEY(OwnerId)
         REFERENCES Users(UserId),
 
+    CONSTRAINT UQ_Workspaces_Owner_Name
+        UNIQUE(OwnerId, Name),
+
     CONSTRAINT CK_Workspaces_Visibility
         CHECK (Visibility IN ('Public','Private'))
 );

@@ -38,4 +38,23 @@ public class GlobalExceptionHandler {
                 Map.of("message", exception.getMessage())
         );
     }
+
+    @ExceptionHandler({
+            WorkspaceNotFoundException.class,
+            WorkspaceAccessDeniedException.class,
+            WorkspaceNameAlreadyExistsException.class
+    })
+    public ResponseEntity<Map<String, String>> handleWorkspaceException(RuntimeException exception) {
+        HttpStatus status = exception instanceof WorkspaceNotFoundException
+                ? HttpStatus.NOT_FOUND
+                : exception instanceof WorkspaceNameAlreadyExistsException
+                ? HttpStatus.CONFLICT
+                : HttpStatus.FORBIDDEN;
+        return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+    }
 }

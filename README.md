@@ -36,7 +36,6 @@ my-wiki/
 
 ## Prerequisites
 
-- JDK 21
 - Maven 3.9+
 - SQL Server 2022 
 - VS Code/IntelliJ IDEA 

@@ -7,7 +7,13 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "Workspaces",
-        schema = "dbo"
+        schema = "dbo",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "UQ_Workspaces_Owner_Name",
+                        columnNames = {"OwnerId", "Name"}
+                )
+        }
 )
 public class Workspace {
 

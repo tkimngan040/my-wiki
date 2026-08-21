@@ -2,6 +2,7 @@ package com.mywiki.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,7 +45,8 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/csrf"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/workspaces/**").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
