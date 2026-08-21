@@ -3,7 +3,14 @@ package com.mywiki.repository;
 import com.mywiki.model.entity.Link;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface LinkRepository extends JpaRepository<Link, Integer> {
+
+    @Modifying
+    @Query("delete from Link link where link.workspace.workspaceId = :workspaceId")
+    void deleteAllByWorkspaceId(@Param("workspaceId") Integer workspaceId);
 }

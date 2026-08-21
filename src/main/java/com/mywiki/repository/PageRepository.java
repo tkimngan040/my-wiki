@@ -3,7 +3,14 @@ package com.mywiki.repository;
 import com.mywiki.model.entity.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface PageRepository extends JpaRepository<Page, Integer> {
+
+    @Modifying
+    @Query("delete from Page page where page.workspace.workspaceId = :workspaceId")
+    void deleteAllByWorkspaceId(@Param("workspaceId") Integer workspaceId);
 }

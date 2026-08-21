@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
         schema = "dbo",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "UQ_Folders_Name",
-                        columnNames = {"WorkspaceId", "ParentFolderId", "Name"}
+                        name = "UQ_Folders_Workspace_Folder",
+                        columnNames = {"WorkspaceId", "FolderId"}
                 )
         }
 )

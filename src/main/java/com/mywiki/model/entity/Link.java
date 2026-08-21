@@ -18,6 +18,14 @@ public class Link {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
+            name = "WorkspaceId",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_Links_Workspace")
+    )
+    private Workspace workspace;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
             name = "SourcePageId",
             nullable = false,
             foreignKey = @ForeignKey(name = "FK_Links_SourcePage")
@@ -46,6 +54,7 @@ public class Link {
             Page targetPage,
             String anchorText
     ) {
+        this.workspace = sourcePage.getWorkspace();
         this.sourcePage = sourcePage;
         this.targetPage = targetPage;
         this.anchorText = anchorText;
@@ -64,6 +73,14 @@ public class Link {
 
     public void setLinkId(Integer linkId) {
         this.linkId = linkId;
+    }
+
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
     public Page getSourcePage() {

@@ -1,6 +1,7 @@
 package com.mywiki.model.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
 
@@ -10,8 +11,8 @@ import java.time.LocalDateTime;
         schema = "dbo",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "UQ_Pages_Title",
-                        columnNames = {"FolderId", "Title"}
+                        name = "UQ_Pages_Workspace_Page",
+                        columnNames = {"WorkspaceId", "PageId"}
                 )
         }
 )
@@ -40,6 +41,8 @@ public class Page {
     @Column(name = "Title", nullable = false, length = 200)
     private String title;
 
+    @Lob
+    @Nationalized
     @Column(name = "Content")
     private String content;
 

@@ -8,6 +8,9 @@ import com.mywiki.model.dto.WorkspaceResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.model.entity.Workspace;
 import com.mywiki.repository.UserRepository;
+import com.mywiki.repository.FolderRepository;
+import com.mywiki.repository.LinkRepository;
+import com.mywiki.repository.PageRepository;
 import com.mywiki.repository.WorkspaceRepository;
 import com.mywiki.service.interfaces.WorkspaceService;
 import org.springframework.stereotype.Service;
@@ -23,13 +26,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
+    private final LinkRepository linkRepository;
+    private final PageRepository pageRepository;
+    private final FolderRepository folderRepository;
 
     public WorkspaceServiceImpl(
             WorkspaceRepository workspaceRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            LinkRepository linkRepository,
+            PageRepository pageRepository,
+            FolderRepository folderRepository
     ) {
         this.workspaceRepository = workspaceRepository;
         this.userRepository = userRepository;
+        this.linkRepository = linkRepository;
+        this.pageRepository = pageRepository;
+        this.folderRepository = folderRepository;
     }
 
     @Override
@@ -98,6 +110,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public void deleteWorkspace(Integer userId, Integer workspaceId) {
         Workspace workspace = findWorkspace(workspaceId);
         requireOwner(workspace, userId);
+        linkRepository.deleteAllByWorkspaceId(workspaceId);
+        pageRepository.deleteAllByWorkspaceId(workspaceId);
+        folderRepository.deleteAllByWorkspaceId(workspaceId);
         workspaceRepository.delete(workspace);
     }
 

@@ -1,15 +1,22 @@
+/*
+NOTE:
+This file only records SQL commands that have been executed manually on SQL Server.
+Changes to this file do not automatically affect the MyWiki application.
+If database data needs to be modified, add the commands at the end of this file
+and notify the developer so the changes can be executed manually on SQL Server.
+*/
+
+USE master;
+GO
+
+IF DB_ID(N'MyWiki') IS NULL
+    CREATE DATABASE MyWiki;
+GO
+
 USE MyWiki;
 GO
 
-/*==========================================================
-DROP TABLE
-==========================================================*/
-
-IF OBJECT_ID('Links','U') IS NOT NULL DROP TABLE Links;
-IF OBJECT_ID('Pages','U') IS NOT NULL DROP TABLE Pages;
-IF OBJECT_ID('Folders','U') IS NOT NULL DROP TABLE Folders;
-IF OBJECT_ID('Workspaces','U') IS NOT NULL DROP TABLE Workspaces;
-IF OBJECT_ID('Users','U') IS NOT NULL DROP TABLE Users;
+SET NOCOUNT ON;
 GO
 
 /*==========================================================
@@ -25,6 +32,12 @@ CREATE TABLE Users
     Email VARCHAR(255) NOT NULL,
 
     PasswordHash VARCHAR(255) NOT NULL,
+
+    AvatarUrl VARCHAR(500) NULL,
+
+    DateOfBirth DATE NULL,
+
+    Bio VARCHAR(500) NULL,
 
     CreatedAt DATETIME2 NOT NULL
         CONSTRAINT DF_Users_CreatedAt
@@ -108,18 +121,27 @@ CREATE TABLE Folders
     CONSTRAINT PK_Folders
         PRIMARY KEY(FolderId),
 
+    CONSTRAINT UQ_Folders_Workspace_Folder
+        UNIQUE(WorkspaceId, FolderId),
+
     CONSTRAINT FK_Folders_Workspaces
         FOREIGN KEY(WorkspaceId)
         REFERENCES Workspaces(WorkspaceId)
         ON DELETE CASCADE,
 
     CONSTRAINT FK_Folders_Parent
-        FOREIGN KEY(ParentFolderId)
-        REFERENCES Folders(FolderId),
-
-    CONSTRAINT UQ_Folders_Name
-        UNIQUE(WorkspaceId, ParentFolderId, Name)
+        FOREIGN KEY(WorkspaceId, ParentFolderId)
+        REFERENCES Folders(WorkspaceId, FolderId)
 );
+GO
+
+CREATE UNIQUE INDEX UX_Folders_Root_Name
+ON Folders(WorkspaceId, Name)
+WHERE ParentFolderId IS NULL;
+
+CREATE UNIQUE INDEX UX_Folders_Child_Name
+ON Folders(WorkspaceId, ParentFolderId, Name)
+WHERE ParentFolderId IS NOT NULL;
 GO
 
 /*==========================================================
@@ -154,13 +176,22 @@ CREATE TABLE Pages
 		REFERENCES Workspaces(WorkspaceId)
 		ON DELETE CASCADE,
 
-    CONSTRAINT FK_Pages_Folders
-        FOREIGN KEY(FolderId)
-        REFERENCES Folders(FolderId),
+    CONSTRAINT UQ_Pages_Workspace_Page
+        UNIQUE(WorkspaceId, PageId),
 
-    CONSTRAINT UQ_Pages_Title
-        UNIQUE(FolderId, Title)
+    CONSTRAINT FK_Pages_Folders
+        FOREIGN KEY(WorkspaceId, FolderId)
+        REFERENCES Folders(WorkspaceId, FolderId)
 );
+GO
+
+CREATE UNIQUE INDEX UX_Pages_Root_Title
+ON Pages(WorkspaceId, Title)
+WHERE FolderId IS NULL;
+
+CREATE UNIQUE INDEX UX_Pages_Folder_Title
+ON Pages(WorkspaceId, FolderId, Title)
+WHERE FolderId IS NOT NULL;
 GO
 
 /*==========================================================
@@ -170,6 +201,8 @@ Links
 CREATE TABLE Links
 (
     LinkId INT IDENTITY(1,1),
+
+    WorkspaceId INT NOT NULL,
 
     SourcePageId INT NOT NULL,
 
@@ -184,14 +217,17 @@ CREATE TABLE Links
     CONSTRAINT PK_Links
         PRIMARY KEY(LinkId),
 
+    CONSTRAINT FK_Links_Workspace
+        FOREIGN KEY(WorkspaceId)
+        REFERENCES Workspaces(WorkspaceId),
+
     CONSTRAINT FK_Links_SourcePage
-        FOREIGN KEY(SourcePageId)
-        REFERENCES Pages(PageId)
-        ON DELETE CASCADE,
+        FOREIGN KEY(WorkspaceId, SourcePageId)
+        REFERENCES Pages(WorkspaceId, PageId),
 
     CONSTRAINT FK_Links_TargetPage
-        FOREIGN KEY(TargetPageId)
-        REFERENCES Pages(PageId)
+        FOREIGN KEY(WorkspaceId, TargetPageId)
+        REFERENCES Pages(WorkspaceId, PageId)
 );
 GO
 
@@ -221,10 +257,15 @@ CREATE INDEX IX_Links_TargetPageId
 ON Links(TargetPageId);
 GO
 
-ALTER TABLE dbo.Users
-    ADD AvatarUrl VARCHAR(500) NULL;
-GO
+/*==========================================================
+RESET DATABASE
+-- WARNING: This script deletes all MyWiki data.
+-- Use only for local development or database reset.
+==========================================================*/
 
-ALTER TABLE dbo.Users
-    ADD DateOfBirth DATE NULL,
-    Bio VARCHAR(500) NULL;
+IF OBJECT_ID(N'dbo.Links', N'U') IS NOT NULL DROP TABLE dbo.Links;
+IF OBJECT_ID(N'dbo.Pages', N'U') IS NOT NULL DROP TABLE dbo.Pages;
+IF OBJECT_ID(N'dbo.Folders', N'U') IS NOT NULL DROP TABLE dbo.Folders;
+IF OBJECT_ID(N'dbo.Workspaces', N'U') IS NOT NULL DROP TABLE dbo.Workspaces;
+IF OBJECT_ID(N'dbo.Users', N'U') IS NOT NULL DROP TABLE dbo.Users;
+GO
