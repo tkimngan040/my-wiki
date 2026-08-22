@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public interface PageRepository extends JpaRepository<Page, Integer> {
@@ -19,4 +20,10 @@ public interface PageRepository extends JpaRepository<Page, Integer> {
     @Modifying
     @Query("delete from Page page where page.folder.folderId in :folderIds")
     void deleteAllByFolderIds(@Param("folderIds") Collection<Integer> folderIds);
+
+    List<Page> findAllByWorkspaceWorkspaceId(Integer workspaceId);
+    boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCase(Integer workspaceId, String title);
+    boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCaseAndPageIdNot(
+            Integer workspaceId, String title, Integer pageId
+    );
 }

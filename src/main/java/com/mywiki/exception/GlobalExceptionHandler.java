@@ -70,6 +70,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
     }
 
+    @ExceptionHandler({
+            PageNotFoundException.class,
+            PageNameAlreadyExistsException.class,
+            PageAccessDeniedException.class
+    })
+    public ResponseEntity<Map<String, String>> handlePageException(RuntimeException exception) {
+        HttpStatus status = exception instanceof PageNotFoundException
+                ? HttpStatus.NOT_FOUND
+                : exception instanceof PageNameAlreadyExistsException
+                ? HttpStatus.CONFLICT
+                : HttpStatus.FORBIDDEN;
+        return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler({
+            LinkNotFoundException.class,
+            LinkAccessDeniedException.class,
+            InvalidLinkException.class
+    })
+    public ResponseEntity<Map<String, String>> handleLinkException(RuntimeException exception) {
+        HttpStatus status = exception instanceof LinkNotFoundException
+                ? HttpStatus.NOT_FOUND
+                : exception instanceof LinkAccessDeniedException
+                ? HttpStatus.FORBIDDEN
+                : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException exception) {
         return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
