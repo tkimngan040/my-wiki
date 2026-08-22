@@ -7,10 +7,16 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
+
 @Repository
 public interface PageRepository extends JpaRepository<Page, Integer> {
 
     @Modifying
     @Query("delete from Page page where page.workspace.workspaceId = :workspaceId")
     void deleteAllByWorkspaceId(@Param("workspaceId") Integer workspaceId);
+
+    @Modifying
+    @Query("delete from Page page where page.folder.folderId in :folderIds")
+    void deleteAllByFolderIds(@Param("folderIds") Collection<Integer> folderIds);
 }

@@ -53,6 +53,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
     }
 
+    @ExceptionHandler({
+            FolderNotFoundException.class,
+            FolderAccessDeniedException.class,
+            FolderNameAlreadyExistsException.class,
+            InvalidFolderMoveException.class
+    })
+    public ResponseEntity<Map<String, String>> handleFolderException(RuntimeException exception) {
+        HttpStatus status = exception instanceof FolderNotFoundException
+                ? HttpStatus.NOT_FOUND
+                : exception instanceof FolderNameAlreadyExistsException
+                ? HttpStatus.CONFLICT
+                : exception instanceof FolderAccessDeniedException
+                ? HttpStatus.FORBIDDEN
+                : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(Map.of("message", exception.getMessage()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException exception) {
         return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
