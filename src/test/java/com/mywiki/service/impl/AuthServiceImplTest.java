@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,6 +66,7 @@ class AuthServiceImplTest {
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
+        String originalSessionId = request.getSession(true).getId();
 
         Authentication authentication = authService.login(
                 new LoginRequest(email, password),
@@ -75,6 +77,7 @@ class AuthServiceImplTest {
         assertEquals(email, authentication.getName());
         assertTrue(authentication.isAuthenticated());
         assertNotNull(request.getSession(false));
+        assertNotEquals(originalSessionId, request.getSession(false).getId());
 
         userRepository.delete(user);
     }
