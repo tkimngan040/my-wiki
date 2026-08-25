@@ -133,7 +133,7 @@ class UserServiceImplTest {
         );
 
         assertThrows(
-                RuntimeException.class,
+                IllegalArgumentException.class,
                 () -> userService.changePassword(
                         user.getUserId(),
                         mismatchRequest
@@ -148,7 +148,7 @@ class UserServiceImplTest {
         );
 
         assertThrows(
-                RuntimeException.class,
+                IllegalArgumentException.class,
                 () -> userService.changePassword(
                         user.getUserId(),
                         wrongCurrentRequest

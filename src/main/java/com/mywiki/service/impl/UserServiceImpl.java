@@ -38,21 +38,32 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(Integer userId, ChangePasswordRequest request)
     {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")); // Tìm User hiện tại
-
-        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) // Kiểm tra mật khẩu mới và xác nhận mật khẩu
-        {
-            throw new RuntimeException("New password and confirmation password do not match");
+        if (request == null
+                || request.getCurrentPassword() == null
+                || request.getNewPassword() == null
+                || request.getConfirmNewPassword() == null
+                || request.getCurrentPassword().isBlank()
+                || request.getNewPassword().isBlank()
+                || request.getConfirmNewPassword().isBlank()) {
+            throw new IllegalArgumentException("All password fields are required");
         }
 
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) // Xác thực mật khẩu hiện tại
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword()))
         {
-            throw new RuntimeException("Current password is incorrect");
+            throw new IllegalArgumentException("New password and confirmation password do not match");
         }
 
-        String newPasswordHash = passwordEncoder.encode(request.getNewPassword()); // Hash mật khẩu mới
-        user.setPasswordHash(newPasswordHash); // Cập nhật mật khẩu
-        userRepository.save(user); // Lưu User
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash()))
+        {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        String newPasswordHash = passwordEncoder.encode(request.getNewPassword());
+        user.setPasswordHash(newPasswordHash);
+        userRepository.save(user);
     }
 
 }
