@@ -100,11 +100,10 @@ public class FolderServiceImpl implements FolderService {
         List<Folder> folders = folderRepository.findAllByWorkspaceWorkspaceId(workspaceId);
         Set<Integer> folderIds = collectSubtreeIds(root, folders);
 
-        List<Integer> pageIds = pageRepository.findAll().stream()
-                .filter(page -> page.getFolder() != null
-                        && folderIds.contains(page.getFolder().getFolderId()))
-                .map(page -> page.getPageId())
-                .toList();
+        List<Integer> pageIds = pageRepository.findIdsByWorkspaceIdAndFolderIds(
+                workspaceId,
+                folderIds
+        );
         if (!pageIds.isEmpty()) {
             linkRepository.deleteAllByPageIds(pageIds);
             pageRepository.deleteAllByFolderIds(folderIds);

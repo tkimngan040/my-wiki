@@ -21,6 +21,17 @@ public interface PageRepository extends JpaRepository<Page, Integer> {
     @Query("delete from Page page where page.folder.folderId in :folderIds")
     void deleteAllByFolderIds(@Param("folderIds") Collection<Integer> folderIds);
 
+    @Query("""
+            select page.pageId
+            from Page page
+            where page.workspace.workspaceId = :workspaceId
+              and page.folder.folderId in :folderIds
+            """)
+    List<Integer> findIdsByWorkspaceIdAndFolderIds(
+            @Param("workspaceId") Integer workspaceId,
+            @Param("folderIds") Collection<Integer> folderIds
+    );
+
     List<Page> findAllByWorkspaceWorkspaceId(Integer workspaceId);
     boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCase(Integer workspaceId, String title);
     boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCaseAndPageIdNot(

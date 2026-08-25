@@ -4,7 +4,6 @@ import com.mywiki.exception.*;
 import com.mywiki.model.dto.FolderRequest;
 import com.mywiki.model.dto.FolderResponse;
 import com.mywiki.model.entity.Folder;
-import com.mywiki.model.entity.Page;
 import com.mywiki.model.entity.User;
 import com.mywiki.model.entity.Workspace;
 import com.mywiki.repository.FolderRepository;
@@ -121,19 +120,18 @@ class FolderServiceImplTest {
     void deleteFolder_shouldDeleteSubtreePagesAndLinks() {
         Folder root = folder(20, null, "Root");
         Folder child = folder(21, root, "Child");
-        Page page = new Page(workspace, child, "Page", "Content");
-        page.setPageId(30);
-
         when(workspaceRepository.findById(10)).thenReturn(Optional.of(workspace));
         when(folderRepository.findAllByWorkspaceWorkspaceId(10))
                 .thenReturn(List.of(root, child));
-        when(pageRepository.findAll()).thenReturn(List.of(page));
+        when(pageRepository.findIdsByWorkspaceIdAndFolderIds(eq(10), anyCollection()))
+                .thenReturn(List.of(30));
 
         folderService.deleteFolder(1, 10, 20);
 
         verify(linkRepository).deleteAllByPageIds(anyCollection());
         verify(pageRepository).deleteAllByFolderIds(anyCollection());
         verify(folderRepository).deleteAll(anyList());
+        verify(pageRepository, never()).findAll();
     }
 
     private Folder folder(int id, Folder parent, String name) {
