@@ -1,6 +1,7 @@
 package com.mywiki.controller;
 
 import com.mywiki.model.dto.ChangePasswordRequest;
+import com.mywiki.model.dto.CurrentUserProfileResponse;
 import com.mywiki.model.dto.UpdateAccountRequest;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,14 @@ public class UserController {
     ) {
         this.userService = userService;
         this.userRepository = userRepository;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CurrentUserProfileResponse> getCurrentUserProfile(
+            Authentication authentication
+    ) {
+        Integer userId = getCurrentUserId(authentication);
+        return ResponseEntity.ok(userService.getCurrentUserProfile(userId));
     }
 
     @PutMapping("/me")

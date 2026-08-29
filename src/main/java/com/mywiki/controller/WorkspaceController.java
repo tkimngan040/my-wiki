@@ -1,5 +1,6 @@
 package com.mywiki.controller;
 
+import com.mywiki.model.dto.PaginatedWorkspaceResponse;
 import com.mywiki.model.dto.WorkspaceRequest;
 import com.mywiki.model.dto.WorkspaceResponse;
 import com.mywiki.model.entity.User;
@@ -10,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/workspaces")
@@ -26,8 +25,14 @@ public class WorkspaceController {
     }
 
     @GetMapping
-    public List<WorkspaceResponse> getWorkspaces(Authentication authentication) {
-        return workspaceService.getVisibleWorkspaces(getCurrentUserId(authentication));
+    public PaginatedWorkspaceResponse getWorkspaces(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "updatedAt") String sort,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return workspaceService.getVisibleWorkspaces(getCurrentUserId(authentication), page, size, sort, direction);
     }
 
     @GetMapping("/{workspaceId}")

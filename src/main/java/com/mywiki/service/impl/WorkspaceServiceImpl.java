@@ -3,16 +3,21 @@ package com.mywiki.service.impl;
 import com.mywiki.exception.WorkspaceAccessDeniedException;
 import com.mywiki.exception.WorkspaceNameAlreadyExistsException;
 import com.mywiki.exception.WorkspaceNotFoundException;
+import com.mywiki.model.dto.PaginatedWorkspaceResponse;
 import com.mywiki.model.dto.WorkspaceRequest;
 import com.mywiki.model.dto.WorkspaceResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.model.entity.Workspace;
-import com.mywiki.repository.UserRepository;
 import com.mywiki.repository.FolderRepository;
 import com.mywiki.repository.LinkRepository;
 import com.mywiki.repository.PageRepository;
+import com.mywiki.repository.UserRepository;
 import com.mywiki.repository.WorkspaceRepository;
 import com.mywiki.service.interfaces.WorkspaceService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,12 +51,30 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<WorkspaceResponse> getVisibleWorkspaces(Integer userId) {
-        List<Workspace> workspaces = userId == null
-                ? workspaceRepository.findByVisibilityOrderByUpdatedAtDesc(PUBLIC)
-                : workspaceRepository.findByVisibilityOrOwner_UserIdOrderByUpdatedAtDesc(PUBLIC, userId);
+    public PaginatedWorkspaceResponse getVisibleWorkspaces(Integer userId, int page, int size, String sort, String direction) {
+        validatePaging(page, size, sort, direction);
 
-        return workspaces.stream().map(WorkspaceResponse::from).toList();
+        String normalizedSort = normalizeSort(sort);
+        Sort sortSpec = Sort.by(Sort.Direction.fromString(direction), normalizedSort);
+        Pageable pageable = PageRequest.of(page, size, sortSpec);
+
+        Page<Workspace> result = userId == null
+                ? workspaceRepository.findByVisibility(PUBLIC, pageable)
+                : workspaceRepository.findByVisibilityOrOwner_UserId(PUBLIC, userId, pageable);
+
+        List<WorkspaceResponse> content = result.getContent().stream()
+                .map(WorkspaceResponse::from)
+                .toList();
+
+        return new PaginatedWorkspaceResponse(
+                content,
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                normalizedSort,
+                direction.toLowerCase()
+        );
     }
 
     @Override
@@ -70,13 +93,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public WorkspaceResponse createWorkspace(Integer userId, WorkspaceRequest request) {
         User owner = findUser(userId);
         String visibility = normalizeVisibility(request.getVisibility());
-        if (workspaceRepository.existsByOwner_UserIdAndNameIgnoreCase(userId, request.getName().trim())) {
+        String name = request.getName().trim();
+        if (workspaceRepository.existsByOwner_UserIdAndNameIgnoreCase(userId, name)) {
             throw new WorkspaceNameAlreadyExistsException("Workspace name already exists");
         }
 
         Workspace workspace = new Workspace(
                 owner,
-                request.getName().trim(),
+                name,
                 request.getDescription(),
                 visibility
         );
@@ -144,5 +168,36 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             return PRIVATE;
         }
         throw new IllegalArgumentException("Visibility must be Public or Private");
+    }
+
+    private void validatePaging(int page, int size, String sort, String direction) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page must be greater than or equal to 0");
+        }
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("Size must be between 1 and 100");
+        }
+        if (direction == null || (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc"))) {
+            throw new IllegalArgumentException("Direction must be asc or desc");
+        }
+        if (sort == null || !isValidSort(sort)) {
+            throw new IllegalArgumentException("Sort must be one of: name, createdAt, updatedAt");
+        }
+    }
+
+    private boolean isValidSort(String sort) {
+        return "name".equalsIgnoreCase(sort)
+                || "createdAt".equalsIgnoreCase(sort)
+                || "updatedAt".equalsIgnoreCase(sort);
+    }
+
+    private String normalizeSort(String sort) {
+        if ("createdAt".equalsIgnoreCase(sort)) {
+            return "createdAt";
+        }
+        if ("updatedAt".equalsIgnoreCase(sort)) {
+            return "updatedAt";
+        }
+        return "name";
     }
 }

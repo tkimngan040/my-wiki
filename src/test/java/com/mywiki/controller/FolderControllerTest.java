@@ -1,6 +1,7 @@
 package com.mywiki.controller;
 
 import com.mywiki.model.dto.FolderResponse;
+import com.mywiki.model.dto.PaginatedFolderResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
 import com.mywiki.service.interfaces.FolderService;
@@ -45,24 +46,35 @@ class FolderControllerTest {
     void getFolders_shouldReturnFoldersForAuthenticatedUser() throws Exception {
         User user = user("user@mywiki.com", 1);
         when(userRepository.findByEmail("user@mywiki.com")).thenReturn(Optional.of(user));
-        when(folderService.getVisibleFolders(10, 1))
-                .thenReturn(List.of(response(20, 10, null, "Characters")));
+        when(folderService.getVisibleFolders(10, 1, 0, 20, "name", "asc"))
+                .thenReturn(new PaginatedFolderResponse(
+                        List.of(response(20, 10, null, "Characters")),
+                        0, 20, 1, 1, "name", "asc"
+                ));
 
         mockMvc.perform(get("/api/workspaces/10/folders")
                         .principal(authentication("user@mywiki.com")))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
-                        [
-                          {
-                            "folderId": 20,
-                            "workspaceId": 10,
-                            "parentFolderId": null,
-                            "name": "Characters"
-                          }
-                        ]
+                        {
+                          "content": [
+                            {
+                              "folderId": 20,
+                              "workspaceId": 10,
+                              "parentFolderId": null,
+                              "name": "Characters"
+                            }
+                          ],
+                          "page": 0,
+                          "size": 20,
+                          "totalElements": 1,
+                          "totalPages": 1,
+                          "sort": "name",
+                          "direction": "asc"
+                        }
                         """));
 
-        verify(folderService).getVisibleFolders(10, 1);
+        verify(folderService).getVisibleFolders(10, 1, 0, 20, "name", "asc");
     }
 
     @Test

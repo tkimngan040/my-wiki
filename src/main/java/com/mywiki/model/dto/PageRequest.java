@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class PageRequest {
-    @NotBlank
-    @Size(max = 200)
+    @NotBlank(message = "Title must not be blank")
+    @Size(max = 200, message = "Title must not exceed 200 characters")
     private String title;
     private String content;
     private Integer folderId;

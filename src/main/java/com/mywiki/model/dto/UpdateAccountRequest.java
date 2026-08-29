@@ -1,12 +1,20 @@
 package com.mywiki.model.dto;
 
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 public class UpdateAccountRequest {
 
+    @Size(max = 50, message = "Username must not exceed 50 characters")
     private String username;
+
+    @Size(max = 500, message = "Avatar URL must not exceed 500 characters")
     private String avatarUrl;
+
     private LocalDate dateOfBirth;
+
+    @Size(max = 500, message = "Bio must not exceed 500 characters")
     private String bio;
 
     public UpdateAccountRequest() {

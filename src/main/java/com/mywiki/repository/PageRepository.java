@@ -1,6 +1,6 @@
 package com.mywiki.repository;
 
-import com.mywiki.model.entity.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface PageRepository extends JpaRepository<Page, Integer> {
+public interface PageRepository extends JpaRepository<com.mywiki.model.entity.Page, Integer> {
 
     @Modifying
     @Query("delete from Page page where page.workspace.workspaceId = :workspaceId")
@@ -32,7 +32,8 @@ public interface PageRepository extends JpaRepository<Page, Integer> {
             @Param("folderIds") Collection<Integer> folderIds
     );
 
-    List<Page> findAllByWorkspaceWorkspaceId(Integer workspaceId);
+    List<com.mywiki.model.entity.Page> findAllByWorkspaceWorkspaceId(Integer workspaceId);
+    org.springframework.data.domain.Page<com.mywiki.model.entity.Page> findAllByWorkspaceWorkspaceId(Integer workspaceId, Pageable pageable);
     boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCase(Integer workspaceId, String title);
     boolean existsByWorkspaceWorkspaceIdAndTitleIgnoreCaseAndPageIdNot(
             Integer workspaceId, String title, Integer pageId

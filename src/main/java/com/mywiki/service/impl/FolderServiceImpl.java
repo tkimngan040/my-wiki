@@ -3,14 +3,18 @@ package com.mywiki.service.impl;
 import com.mywiki.exception.*;
 import com.mywiki.model.dto.FolderRequest;
 import com.mywiki.model.dto.FolderResponse;
+import com.mywiki.model.dto.PaginatedFolderResponse;
 import com.mywiki.model.entity.Folder;
-import com.mywiki.model.entity.User;
 import com.mywiki.model.entity.Workspace;
 import com.mywiki.repository.FolderRepository;
 import com.mywiki.repository.LinkRepository;
 import com.mywiki.repository.PageRepository;
 import com.mywiki.repository.WorkspaceRepository;
 import com.mywiki.service.interfaces.FolderService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,12 +43,31 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FolderResponse> getVisibleFolders(Integer workspaceId, Integer userId) {
+    public java.util.List<FolderResponse> getVisibleFolders(Integer workspaceId, Integer userId) {
+        return getVisibleFolders(workspaceId, userId, 0, 20, "name", "asc").content();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedFolderResponse getVisibleFolders(Integer workspaceId, Integer userId, int page, int size, String sort, String direction) {
         Workspace workspace = findWorkspace(workspaceId);
         requireViewAccess(workspace, userId);
-        return folderRepository.findAllByWorkspaceWorkspaceId(workspaceId).stream()
-                .map(FolderResponse::from)
-                .toList();
+        validatePaging(page, size, sort, direction);
+
+        String normalizedSort = normalizeSort(sort);
+        Sort sortSpec = Sort.by(Sort.Direction.fromString(direction), normalizedSort);
+        Pageable pageable = PageRequest.of(page, size, sortSpec);
+
+        Page<Folder> result = folderRepository.findAllByWorkspaceWorkspaceId(workspaceId, pageable);
+        return new PaginatedFolderResponse(
+                result.getContent().stream().map(FolderResponse::from).toList(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                normalizedSort,
+                direction.toLowerCase()
+        );
     }
 
     @Override
@@ -79,7 +102,7 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = findFolder(workspaceId, folderId);
         Folder parent = findParent(workspaceId, request.getParentFolderId());
 
-        if (parent != null && isDescendant(parent, folder, workspaceId)) {
+        if (parent != null && isDescendant(parent, folder)) {
             throw new InvalidFolderMoveException("A folder cannot be moved into its own descendant");
         }
 
@@ -160,7 +183,7 @@ public class FolderServiceImpl implements FolderService {
         }
     }
 
-    private boolean isDescendant(Folder candidateParent, Folder folder, Integer workspaceId) {
+    private boolean isDescendant(Folder candidateParent, Folder folder) {
         Folder current = candidateParent;
         while (current != null) {
             if (current.getFolderId().equals(folder.getFolderId())) {
@@ -196,5 +219,32 @@ public class FolderServiceImpl implements FolderService {
             current = current.getParentFolder();
         }
         return depth;
+    }
+
+    private void validatePaging(int page, int size, String sort, String direction) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page must be greater than or equal to 0");
+        }
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("Size must be between 1 and 100");
+        }
+        if (direction == null || (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc"))) {
+            throw new IllegalArgumentException("Direction must be asc or desc");
+        }
+        if (sort == null || !isValidSort(sort)) {
+            throw new IllegalArgumentException("Sort must be one of: name, createdAt, updatedAt");
+        }
+    }
+
+    private boolean isValidSort(String sort) {
+        return "name".equalsIgnoreCase(sort)
+                || "createdAt".equalsIgnoreCase(sort)
+                || "updatedAt".equalsIgnoreCase(sort);
+    }
+
+    private String normalizeSort(String sort) {
+        if ("createdAt".equalsIgnoreCase(sort)) return "createdAt";
+        if ("updatedAt".equalsIgnoreCase(sort)) return "updatedAt";
+        return "name";
     }
 }

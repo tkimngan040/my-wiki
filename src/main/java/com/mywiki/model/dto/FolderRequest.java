@@ -5,11 +5,11 @@ import jakarta.validation.constraints.Size;
 
 public class FolderRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Name must not be blank")
+    @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
 
     private Integer parentFolderId;

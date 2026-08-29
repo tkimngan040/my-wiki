@@ -1,6 +1,7 @@
 package com.mywiki.controller;
 
 import com.mywiki.model.dto.LinkResponse;
+import com.mywiki.model.dto.PaginatedLinkResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
 import com.mywiki.service.interfaces.LinkService;
@@ -30,11 +31,31 @@ class LinkControllerTest {
 
     @Test
     void getLinks_shouldAllowAnonymousRequest() throws Exception {
-        when(linkService.getLinks(10, 20, null)).thenReturn(java.util.List.of(response()));
+        when(linkService.getLinks(10, 20, null, 0, 20, "createdAt", "desc"))
+                .thenReturn(new PaginatedLinkResponse(
+                        java.util.List.of(response()),
+                        0, 20, 1, 1, "createdAt", "desc"
+                ));
         mockMvc.perform(get("/api/workspaces/10/pages/20/links"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{\"linkId\":30,\"sourcePageId\":20,\"targetPageId\":21}]"));
-        verify(linkService).getLinks(10, 20, null);
+                .andExpect(content().json("""
+                        {
+                          "content": [
+                            {
+                              "linkId": 30,
+                              "sourcePageId": 20,
+                              "targetPageId": 21
+                            }
+                          ],
+                          "page": 0,
+                          "size": 20,
+                          "totalElements": 1,
+                          "totalPages": 1,
+                          "sort": "createdAt",
+                          "direction": "desc"
+                        }
+                        """));
+        verify(linkService).getLinks(10, 20, null, 0, 20, "createdAt", "desc");
     }
 
     @Test

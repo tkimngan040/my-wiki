@@ -1,5 +1,6 @@
 package com.mywiki.controller;
 
+import com.mywiki.exception.GlobalExceptionHandler;
 import com.mywiki.model.dto.LoginRequest;
 import com.mywiki.model.dto.RegisterRequest;
 import com.mywiki.service.interfaces.AuthService;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AuthControllerTest {
@@ -32,6 +34,7 @@ class AuthControllerTest {
         authService = mock(AuthService.class);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(new AuthController(authService))
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
@@ -76,13 +79,13 @@ class AuthControllerTest {
                                 }
                                 """))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().json(
-                        "{\"message\":\"Invalid email or password\"}"
-                ));
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"))
+                .andExpect(jsonPath("$.message").value("Invalid email or password"))
+                .andExpect(jsonPath("$.path").value("/api/auth/login"));
     }
 
     @Test
-    void register_shouldReturnOk() throws Exception {
+    void register_shouldReturnCreated() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -92,21 +95,19 @@ class AuthControllerTest {
                                   "password": "password"
                                 }
                                 """))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(
-                        "{\"message\":\"Register successful\"}"
+                        "{\"message\":\"Registration successful\"}"
                 ));
 
         verify(authService).register(any(RegisterRequest.class));
     }
 
     @Test
-    void logout_shouldReturnOk() throws Exception {
+    void logout_shouldReturnNoContent() throws Exception {
         mockMvc.perform(post("/api/auth/logout"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "{\"message\":\"Logout successful\"}"
-                ));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
 
         verify(authService).logout(
                 any(HttpServletRequest.class),

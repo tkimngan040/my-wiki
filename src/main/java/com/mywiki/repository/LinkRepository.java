@@ -1,6 +1,8 @@
 package com.mywiki.repository;
 
 import com.mywiki.model.entity.Link;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,6 +29,9 @@ public interface LinkRepository extends JpaRepository<Link, Integer> {
 
     List<Link> findAllByWorkspaceWorkspaceIdAndSourcePagePageId(
             Integer workspaceId, Integer sourcePageId
+    );
+    Page<Link> findAllByWorkspaceWorkspaceIdAndSourcePagePageId(
+            Integer workspaceId, Integer sourcePageId, Pageable pageable
     );
     List<Link> findAllByWorkspaceWorkspaceId(Integer workspaceId);
 }

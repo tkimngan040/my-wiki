@@ -1,5 +1,6 @@
 package com.mywiki.controller;
 
+import com.mywiki.model.dto.PaginatedWorkspaceResponse;
 import com.mywiki.model.dto.WorkspaceResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class WorkspaceControllerTest {
@@ -40,29 +42,33 @@ class WorkspaceControllerTest {
                 .standaloneSetup(new WorkspaceController(workspaceService, userRepository))
                 .build();
     }
-
     @Test
-    void getWorkspaces_shouldReturnVisibleWorkspacesForAuthenticatedUser() throws Exception {
+    void getWorkspaces_shouldReturnPaginatedVisibleWorkspacesForAuthenticatedUser() throws Exception {
         User user = user("user@mywiki.com", 1);
         when(userRepository.findByEmail("user@mywiki.com"))
                 .thenReturn(Optional.of(user));
-        when(workspaceService.getVisibleWorkspaces(1))
-                .thenReturn(List.of(response(10, "World", "Private")));
+        when(workspaceService.getVisibleWorkspaces(1, 0, 20, "updatedAt", "desc"))
+                .thenReturn(new PaginatedWorkspaceResponse(
+                        List.of(response(10, "World", "Private")),
+                        0,
+                        20,
+                        1,
+                        1,
+                        "updatedAt",
+                        "desc"
+                ));
 
         mockMvc.perform(get("/api/workspaces")
                         .principal(authentication("user@mywiki.com")))
                 .andExpect(status().isOk())
-                .andExpect(content().json("""
-                        [
-                          {
-                            "workspaceId": 10,
-                            "name": "World",
-                            "visibility": "Private"
-                          }
-                        ]
-                        """));
+                .andExpect(jsonPath("$.content[0].workspaceId").value(10))
+                .andExpect(jsonPath("$.content[0].name").value("World"))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.sort").value("updatedAt"))
+                .andExpect(jsonPath("$.direction").value("desc"));
 
-        verify(workspaceService).getVisibleWorkspaces(1);
+        verify(workspaceService).getVisibleWorkspaces(1, 0, 20, "updatedAt", "desc");
     }
 
     @Test

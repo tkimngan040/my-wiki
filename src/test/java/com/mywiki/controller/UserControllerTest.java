@@ -1,5 +1,6 @@
 package com.mywiki.controller;
 
+import com.mywiki.model.dto.CurrentUserProfileResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
 import com.mywiki.service.interfaces.UserService;
@@ -10,14 +11,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserControllerTest {
@@ -33,6 +37,25 @@ class UserControllerTest {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(new UserController(userService, userRepository))
                 .build();
+    }
+
+    @Test
+    void getCurrentUserProfile_shouldReturnUserProfile() throws Exception {
+        User user = new User("Username", "user@mywiki.com", "password");
+        user.setUserId(1);
+        user.setAvatarUrl("https://example.com/avatar.jpg");
+        user.setDateOfBirth(LocalDate.of(2000, 1, 1));
+        user.setBio("Writer");
+
+        when(userRepository.findByEmail("user@mywiki.com")).thenReturn(Optional.of(user));
+        when(userService.getCurrentUserProfile(1)).thenReturn(CurrentUserProfileResponse.from(user));
+
+        mockMvc.perform(get("/api/users/me")
+                        .principal(authentication("user@mywiki.com")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.email").value("user@mywiki.com"))
+                .andExpect(jsonPath("$.username").value("Username"));
     }
 
     @Test

@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class LinkRequest {
-    @NotNull
+    @NotNull(message = "Target page ID is required")
     private Integer targetPageId;
-    @NotBlank
-    @Size(max = 200)
+    @NotBlank(message = "Anchor text must not be blank")
+    @Size(max = 200, message = "Anchor text must not exceed 200 characters")
     private String anchorText;
 
     public LinkRequest() {

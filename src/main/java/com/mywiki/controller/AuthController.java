@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -30,23 +30,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<Map<String, String>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse
     ) {
-        try {
-            Authentication authentication =
-                    authService.login(request, httpRequest, httpResponse);
+        Authentication authentication = authService.login(request, httpRequest, httpResponse);
 
-            return ResponseEntity.ok(Map.of(
-                    "message", "Login successful",
-                    "email", authentication.getName()
-            ));
-        } catch (BadCredentialsException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid email or password"));
-        }
+        Map<String, String> body = new LinkedHashMap<>();
+        body.put("email", authentication.getName());
+        body.put("message", "Login successful");
+
+        return ResponseEntity.ok(body);
     }
 
     @PostMapping("/register")
@@ -54,8 +49,8 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
         authService.register(request);
-        return ResponseEntity.ok(
-                Map.of("message", "Register successful")
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of("message", "Registration successful")
         );
     }
 
@@ -67,12 +62,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(
+    public ResponseEntity<Void> logout(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         authService.logout(request, response);
-        return ResponseEntity.ok(Map.of("message", "Logout successful"));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")

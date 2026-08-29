@@ -2,6 +2,7 @@ package com.mywiki.controller;
 
 import com.mywiki.model.dto.FolderRequest;
 import com.mywiki.model.dto.FolderResponse;
+import com.mywiki.model.dto.PaginatedFolderResponse;
 import com.mywiki.model.entity.User;
 import com.mywiki.repository.UserRepository;
 import com.mywiki.service.interfaces.FolderService;
@@ -10,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/workspaces/{workspaceId}/folders")
@@ -26,11 +25,22 @@ public class FolderController {
     }
 
     @GetMapping
-    public List<FolderResponse> getFolders(
+    public PaginatedFolderResponse getFolders(
             @PathVariable Integer workspaceId,
-            Authentication authentication
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "name") String sort,
+            @RequestParam(defaultValue = "asc") String direction
     ) {
-        return folderService.getVisibleFolders(workspaceId, getCurrentUserId(authentication));
+        return folderService.getVisibleFolders(
+                workspaceId,
+                getCurrentUserId(authentication),
+                page,
+                size,
+                sort,
+                direction
+        );
     }
 
     @GetMapping("/{folderId}")

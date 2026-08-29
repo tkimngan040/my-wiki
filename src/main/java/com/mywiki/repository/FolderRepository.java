@@ -1,6 +1,8 @@
 package com.mywiki.repository;
 
 import com.mywiki.model.entity.Folder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,6 +19,7 @@ public interface FolderRepository extends JpaRepository<Folder, Integer> {
     void deleteAllByWorkspaceId(@Param("workspaceId") Integer workspaceId);
 
     List<Folder> findAllByWorkspaceWorkspaceId(Integer workspaceId);
+    Page<Folder> findAllByWorkspaceWorkspaceId(Integer workspaceId, Pageable pageable);
 
     boolean existsByWorkspaceWorkspaceIdAndParentFolderFolderIdAndNameIgnoreCase(
             Integer workspaceId, Integer parentFolderId, String name
