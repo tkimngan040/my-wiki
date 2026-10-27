@@ -9,9 +9,13 @@
         <module name="my-wiki" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="frontend" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="frontend" options="-parameters" />
       <module name="my-wiki" options="-parameters" />
     </option>
   </component>

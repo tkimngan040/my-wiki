@@ -1,0 +1,16 @@
+name: MyWiki_Local
+values:
+  - key: baseUrl
+    value: ''
+  - key: csrfToken
+    value: ''
+  - key: workspaceId
+    value: ''
+  - key: folderId
+    value: ''
+  - key: sourcePageId
+    value: ''
+  - key: targetPageId
+    value: ''
+  - key: linkId
+    value: ''

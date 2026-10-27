@@ -45,8 +45,24 @@ my-wiki/
 https://github.com/tkimngan040/my-wiki.git
 ```
 
-## Configure database
+## Chạy dự án
 
+Đảm bảo SQL Server và database MyWiki đã chạy, sau đó mở **2 terminal** tại thư mục gốc dự án.
 
-## Run project
+### Backend
 
+```powershell
+mvn spring-boot:run
+```
+
+Chạy Spring Boot backend tại `http://localhost:8080`. Có thể chạy `MyWikiApplication` bằng nút Run trong IntelliJ thay cho lệnh trên.
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+`npm install` cài các thư viện frontend (chỉ cần chạy lần đầu); `npm run dev` khởi động Next.js tại `http://localhost:3000`.
