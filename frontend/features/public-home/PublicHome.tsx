@@ -36,7 +36,9 @@ type IconName =
   | "question"
   | "mail"
   | "close"
-  | "arrow";
+  | "arrow"
+  | "sidebar-left"
+  | "sidebar-right";
 
 type Workspace = {
   workspaceId: number;
@@ -110,6 +112,31 @@ function saveTheme(theme: "light" | "dark") {
   window.dispatchEvent(new Event("mywiki-theme-change"));
 }
 
+function subscribeToSidebarState(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("mywiki-sidebar-change", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("mywiki-sidebar-change", onChange);
+  };
+}
+
+function getSidebarSnapshot(side: "left" | "right"): "true" | "false" {
+  if (typeof window === "undefined") return "false";
+  return window.localStorage.getItem(`mywiki-${side}-sidebar-collapsed`) === "true"
+    ? "true"
+    : "false";
+}
+
+function getServerSidebarSnapshot(): "false" {
+  return "false";
+}
+
+function saveSidebarState(side: "left" | "right", collapsed: boolean) {
+  window.localStorage.setItem(`mywiki-${side}-sidebar-collapsed`, String(collapsed));
+  window.dispatchEvent(new Event("mywiki-sidebar-change"));
+}
+
 const featureList = [
   {
     icon: "layers" as const,
@@ -165,6 +192,8 @@ function Icon({
     mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></>,
     close: <><path d="m6 6 12 12M18 6 6 18" /></>,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
+    "sidebar-left": <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>,
+    "sidebar-right": <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M15 4v16" /></>,
   };
 
   return (
@@ -301,6 +330,10 @@ export default function PublicHome() {
   const [showAllWorkspaces, setShowAllWorkspaces] = useState(false);
   const [signedInProfile, setSignedInProfile] =
     useState<SignedInProfile | null>(null);
+  const leftCollapsed =
+    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("left"), getServerSidebarSnapshot) === "true";
+  const rightCollapsed =
+    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("right"), getServerSidebarSnapshot) === "true";
   const [accountError, setAccountError] = useState("");
   const [scope, setScope] = useState<SearchScope>("Tất cả");
   const [scopeOpen, setScopeOpen] = useState(false);
@@ -582,7 +615,7 @@ export default function PublicHome() {
     : [];
 
   return (
-    <div className="public-home" data-theme={theme}>
+    <div className={`public-home${leftCollapsed ? " left-collapsed" : ""}${rightCollapsed ? " right-collapsed" : ""}`} data-theme={theme}>
       <aside className="left-sidebar">
         <Link className="app-logo" href="/" aria-label="MyWiki trang chủ">
           <span className="logo-icon"><Icon name="book" size={20} /></span>
@@ -659,6 +692,22 @@ export default function PublicHome() {
       </aside>
 
       <main className="main-content">
+        <header className="home-topbar">
+          <div className="home-top-title">
+            <button className="home-panel-button" type="button" aria-label={leftCollapsed ? "Mở thanh bên trái" : "Thu gọn thanh bên trái"} aria-expanded={!leftCollapsed} onClick={() => {
+              saveSidebarState("left", !leftCollapsed);
+            }}><Icon name="sidebar-left" size={17} /></button>
+            <strong>MYWIKI WORKSPACE</strong>
+          </div>
+          <div className="home-top-actions">
+            <button className="home-panel-button" type="button" aria-label={rightCollapsed ? "Mở thanh bên phải" : "Thu gọn thanh bên phải"} aria-expanded={!rightCollapsed} onClick={() => {
+              saveSidebarState("right", !rightCollapsed);
+            }}><Icon name="sidebar-right" size={17} /></button>
+            <button className="home-theme-button" type="button" aria-label={theme === "light" ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng"} onClick={() => saveTheme(theme === "light" ? "dark" : "light")}>
+              <Icon name={theme === "light" ? "moon" : "sun"} size={17} />
+            </button>
+          </div>
+        </header>
         <section className="search-section" ref={searchSection} aria-label="Tìm kiếm công khai">
           <form className="search-form" role="search" onSubmit={handleSearch}>
             <label className="search-input-wrap">
@@ -941,16 +990,6 @@ export default function PublicHome() {
           </div>
         </section>
 
-        <button
-          className="theme-toggle-row"
-          type="button"
-          role="switch"
-          aria-checked={theme === "dark"}
-          onClick={() => saveTheme(theme === "light" ? "dark" : "light")}
-        >
-          <span className="theme-toggle-label"><Icon name={theme === "light" ? "sun" : "moon"} size={17} /> Chế độ {theme === "light" ? "sáng" : "tối"}</span>
-          <span className={`toggle-switch ${theme === "dark" ? "toggle-on" : ""}`}><span /></span>
-        </button>
         {signedInProfile && (
           <div className="right-sidebar-account-actions">
             {accountError && <p className="account-inline-error" role="alert">{accountError}</p>}

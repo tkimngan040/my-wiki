@@ -33,9 +33,9 @@ type WorkspaceResponse = {
   totalPages: number;
 };
 
-type Filter = "Tất cả" | "Của tôi" | "Công khai";
+type Filter = "Tất cả" | "Cá nhân" | "Công khai";
 
-const filters: Filter[] = ["Tất cả", "Của tôi", "Công khai"];
+const filters: Filter[] = ["Tất cả", "Cá nhân", "Công khai"];
 
 function subscribeToTheme(onChange: () => void) {
   window.addEventListener("storage", onChange);
@@ -60,11 +60,36 @@ function saveTheme(theme: "light" | "dark") {
   window.dispatchEvent(new Event("mywiki-theme-change"));
 }
 
+function subscribeToSidebarState(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("mywiki-sidebar-change", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("mywiki-sidebar-change", onChange);
+  };
+}
+
+function getSidebarSnapshot(side: "left" | "right"): "true" | "false" {
+  if (typeof window === "undefined") return "false";
+  return window.localStorage.getItem(`mywiki-${side}-sidebar-collapsed`) === "true"
+    ? "true"
+    : "false";
+}
+
+function getServerSidebarSnapshot(): "false" {
+  return "false";
+}
+
+function saveSidebarState(side: "left" | "right", collapsed: boolean) {
+  window.localStorage.setItem(`mywiki-${side}-sidebar-collapsed`, String(collapsed));
+  window.dispatchEvent(new Event("mywiki-sidebar-change"));
+}
+
 function DashboardIcon({
   name,
   size = 18,
 }: {
-  name: "book" | "home" | "search" | "layers" | "globe" | "plus" | "clock" | "folder" | "file" | "settings" | "help" | "sun" | "moon" | "chevron" | "arrow" | "close" | "sparkles" | "dots" | "lightbulb";
+  name: "book" | "home" | "search" | "layers" | "globe" | "plus" | "clock" | "folder" | "file" | "settings" | "help" | "sun" | "moon" | "chevron" | "arrow" | "close" | "sparkles" | "dots" | "lightbulb" | "sidebar-left" | "sidebar-right";
   size?: number;
 }) {
   const paths: Record<typeof name, React.ReactNode> = {
@@ -87,6 +112,8 @@ function DashboardIcon({
     sparkles: <><path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5z" /></>,
     dots: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
     lightbulb: <><path d="M9 18h6m-5 3h4m-2-19a7 7 0 0 0-4 12.7c.8.6 1 1.1 1 2.3h6c0-1.2.2-1.7 1-2.3A7 7 0 0 0 12 2z" /></>,
+    "sidebar-left": <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>,
+    "sidebar-right": <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M15 4v16" /></>,
   };
 
   return (
@@ -136,6 +163,10 @@ export default function AccountDashboard() {
   const [error, setError] = useState("");
   const [retryCount, setRetryCount] = useState(0);
   const [showCreateNotice, setShowCreateNotice] = useState(false);
+  const leftCollapsed =
+    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("left"), getServerSidebarSnapshot) === "true";
+  const rightCollapsed =
+    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("right"), getServerSidebarSnapshot) === "true";
   const [modalTitle, setModalTitle] = useState("Tạo Workspace");
   const [modalMessage, setModalMessage] = useState(
     "Giao diện quản lý Workspace đang được hoàn thiện. Hiện tại bạn có thể xem các Workspace đã có; thao tác tạo và chỉnh sửa sẽ được kết nối ở bước tiếp theo.",
@@ -180,7 +211,7 @@ export default function AccountDashboard() {
       const isPublic = workspace.visibility.toLowerCase() === "public";
       const matchesFilter =
         filter === "Tất cả" ||
-        (filter === "Của tôi" && workspace.ownerUsername === profile?.username) ||
+        (filter === "Cá nhân" && workspace.ownerUsername === profile?.username) ||
         (filter === "Công khai" && isPublic);
       const matchesQuery =
         !normalizedQuery ||
@@ -237,7 +268,7 @@ export default function AccountDashboard() {
   const publicCount = workspaces.filter((workspace) => workspace.visibility.toLowerCase() === "public").length;
 
   return (
-    <div className="account-dashboard" data-theme={theme}>
+    <div className={`account-dashboard${leftCollapsed ? " left-collapsed" : ""}${rightCollapsed ? " right-collapsed" : ""}`} data-theme={theme}>
       <aside className="dashboard-left">
         <Link className="dashboard-logo" href="/">
           <span><DashboardIcon name="book" size={20} /></span> MyWiki
@@ -303,12 +334,17 @@ export default function AccountDashboard() {
 
       <main className="dashboard-main">
         <header className="dashboard-topbar">
-          <div className="dashboard-breadcrumb"><span>Không gian của bạn</span><DashboardIcon name="chevron" size={14} /><strong>Workspace của tôi</strong></div>
+          <div className="dashboard-top-title">
+            <button className="dashboard-panel-button" type="button" aria-label={leftCollapsed ? "Mở thanh bên trái" : "Thu gọn thanh bên trái"} aria-expanded={!leftCollapsed} onClick={() => {
+              saveSidebarState("left", !leftCollapsed);
+            }}><DashboardIcon name="sidebar-left" size={17} /></button>
+            <strong>MYWIKI WORKSPACE</strong>
+          </div>
           <div className="dashboard-top-actions">
-            <button className="dashboard-search-shortcut" type="button" onClick={() => document.getElementById("workspace-search")?.focus()}>
-              <DashboardIcon name="search" size={16} /><span>Tìm Workspace...</span><kbd>⌘ K</kbd>
-            </button>
-            <button className="dashboard-theme-button" type="button" aria-label="Đổi giao diện" onClick={() => saveTheme(theme === "light" ? "dark" : "light")}>
+            <button className="dashboard-panel-button" type="button" aria-label={rightCollapsed ? "Mở thanh bên phải" : "Thu gọn thanh bên phải"} aria-expanded={!rightCollapsed} onClick={() => {
+              saveSidebarState("right", !rightCollapsed);
+            }}><DashboardIcon name="sidebar-right" size={17} /></button>
+            <button className="dashboard-theme-button" type="button" aria-label={theme === "light" ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng"} onClick={() => saveTheme(theme === "light" ? "dark" : "light")}>
               <DashboardIcon name={theme === "light" ? "moon" : "sun"} size={17} />
             </button>
           </div>

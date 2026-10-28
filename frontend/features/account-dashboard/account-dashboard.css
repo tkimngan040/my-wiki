@@ -6,6 +6,8 @@ body:has(.account-dashboard) {
 }
 
 .account-dashboard {
+  --dashboard-left-width: 248px;
+  --dashboard-right-width: 274px;
   --dash-bg: #f7f8f5;
   --dash-surface: #fff;
   --dash-surface-soft: #fbfcf9;
@@ -18,7 +20,7 @@ body:has(.account-dashboard) {
   --dash-green-soft: #edf3ec;
   display: grid;
   min-height: 100vh;
-  grid-template-columns: 248px minmax(420px, 1fr) 274px;
+  grid-template-columns: var(--dashboard-left-width) minmax(0, 1fr) var(--dashboard-right-width);
   background: var(--dash-bg);
   color: var(--dash-text);
   font-family: "Nunito Sans", sans-serif;
@@ -324,21 +326,33 @@ body:has(.account-dashboard) {
   border-bottom: 1px solid var(--dash-border);
 }
 
-.dashboard-breadcrumb,
+.dashboard-top-title,
 .dashboard-top-actions {
   display: flex;
   align-items: center;
 }
 
-.dashboard-breadcrumb {
-  gap: 7px;
-  color: var(--dash-subtle);
+.dashboard-top-title {
+  gap: 10px;
+  color: var(--dash-green);
   font-size: 10px;
+  letter-spacing: 1.1px;
 }
 
-.dashboard-breadcrumb strong {
-  color: var(--dash-text);
-  font-weight: 700;
+.dashboard-panel-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border: 1px solid var(--dash-border);
+  border-radius: 7px;
+  background: var(--dash-surface);
+  color: var(--dash-muted);
+}
+
+.dashboard-panel-button:hover {
+  color: var(--dash-green);
 }
 
 .dashboard-top-actions {
@@ -1200,7 +1214,8 @@ body:has(.account-dashboard) {
 
 @media (max-width: 1200px) {
   .account-dashboard {
-    grid-template-columns: 218px minmax(390px, 1fr) 250px;
+    --dashboard-left-width: 218px;
+    --dashboard-right-width: 250px;
   }
 
   .dashboard-left {
@@ -1221,7 +1236,7 @@ body:has(.account-dashboard) {
 
 @media (max-width: 980px) {
   .account-dashboard {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: var(--dashboard-left-width) minmax(0, 1fr);
   }
 
   .dashboard-right {
@@ -1452,13 +1467,157 @@ body:has(.account-dashboard) {
 }
 
 @media (max-width: 370px) {
-  .dashboard-breadcrumb > span {
-    display: none;
-  }
-
   .dashboard-stats article {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .account-dashboard.left-collapsed {
+    --dashboard-left-width: 64px;
+  }
+
+  .account-dashboard.right-collapsed {
+    --dashboard-right-width: 58px;
+  }
+
+  .dashboard-left,
+  .dashboard-right {
+    transition: padding 180ms ease;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-left {
+    align-items: center;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-logo {
+    padding: 0;
+    font-size: 0;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-logo > span {
+    width: 38px;
+    height: 38px;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-nav {
+    width: 100%;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-nav-label,
+  .account-dashboard.left-collapsed .dashboard-nav-heading,
+  .account-dashboard.left-collapsed .dashboard-nav-workspace,
+  .account-dashboard.left-collapsed .dashboard-nav-empty,
+  .account-dashboard.left-collapsed .recent-empty {
+    display: none;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-nav-item {
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-left-bottom > .dashboard-nav-item {
+    border-style: solid;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-account-chip {
+    justify-content: center;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .account-dashboard.left-collapsed .account-chip-copy {
+    display: none;
+  }
+
+  .account-dashboard.left-collapsed .dashboard-account-chip > button {
+    display: none;
+  }
+
+  .account-dashboard.right-collapsed .dashboard-right {
+    align-items: center;
+    overflow: hidden;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .account-dashboard.right-collapsed .profile-card {
+    width: 100%;
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .account-dashboard.right-collapsed .profile-card-top {
+    justify-content: center;
+  }
+
+  .account-dashboard.right-collapsed .profile-avatar {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    font-size: 13px;
+  }
+
+  .account-dashboard.right-collapsed .profile-status,
+  .account-dashboard.right-collapsed .profile-card-top > button,
+  .account-dashboard.right-collapsed .profile-card > p,
+  .account-dashboard.right-collapsed .profile-divider,
+  .account-dashboard.right-collapsed .profile-summary,
+  .account-dashboard.right-collapsed .profile-settings-link,
+  .account-dashboard.right-collapsed .dashboard-quick-section,
+  .account-dashboard.right-collapsed .dashboard-logout,
+  .account-dashboard.right-collapsed .dashboard-right-footer {
+    display: none;
+  }
+
+  .account-dashboard.right-collapsed .profile-card h2 {
+    margin-top: 4px;
+    font-size: 7px;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 980px) {
+    .account-dashboard.right-collapsed {
+      grid-template-columns: var(--dashboard-left-width) minmax(0, 1fr) 58px;
+    }
+
+    .account-dashboard.right-collapsed .dashboard-right {
+      position: sticky;
+      top: 0;
+      display: flex;
+      grid-column: 3;
+      grid-row: 1;
+      height: 100vh;
+      min-height: 700px;
+      border-top: 0;
+      border-left: 1px solid var(--dash-border);
+      padding-top: 17px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .account-dashboard.left-collapsed .dashboard-left {
+      align-items: stretch;
+      min-height: 0;
+      padding: 13px 15px 8px;
+    }
+
+    .account-dashboard.left-collapsed .dashboard-nav,
+    .account-dashboard.left-collapsed .dashboard-left-bottom {
+      display: none;
+    }
+
+    .account-dashboard.right-collapsed .dashboard-right {
+      display: none;
+    }
   }
 
   .dashboard-stats small {
