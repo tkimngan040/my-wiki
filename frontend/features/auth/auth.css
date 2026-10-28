@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
   --ink: #252b25;
@@ -19,7 +19,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -85,7 +85,7 @@ input {
   align-items: center;
   gap: 10px;
   color: var(--ink);
-  font-family: "Manrope", sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.8px;
@@ -121,7 +121,7 @@ input {
 .intro-copy h1 {
   max-width: 450px;
   margin: 0;
-  font-family: "Manrope", sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: clamp(38px, 4vw, 58px);
   font-weight: 600;
   letter-spacing: -2.7px;
@@ -193,7 +193,7 @@ input {
 
 .form-heading h2 {
   margin: 0;
-  font-family: "Manrope", sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -1.3px;
@@ -206,7 +206,7 @@ input {
   line-height: 1.6;
 }
 
-.register-form {
+.auth-form {
   display: grid;
   gap: 17px;
 }
@@ -332,11 +332,6 @@ input {
   text-align: center;
 }
 
-.login-prompt span {
-  color: var(--green);
-  font-weight: 600;
-}
-
 .notice {
   display: flex;
   align-items: flex-start;
@@ -402,6 +397,30 @@ input {
   font-weight: 700;
 }
 
+.auth-link {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-success {
+  text-align: center;
+}
+
+.auth-success .notice {
+  margin: 24px 0;
+  text-align: left;
+}
+
+.auth-success .submit-button {
+  width: 100%;
+  text-decoration: none;
+}
+
 @media (max-width: 850px) {
   .page-shell {
     grid-template-columns: minmax(0, 0.85fr) minmax(420px, 1.15fr);
@@ -414,6 +433,47 @@ input {
 
   .intro-copy h1 {
     font-size: 42px;
+  }
+}
+
+@media (min-width: 701px) and (max-height: 800px) {
+  .intro-panel {
+    padding-top: 30px;
+    padding-bottom: 26px;
+  }
+
+  .intro-copy {
+    padding-top: 42px;
+    padding-bottom: 52px;
+  }
+
+  .intro-copy h1 {
+    font-size: clamp(36px, 3.5vw, 48px);
+  }
+
+  .form-panel {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .form-heading {
+    margin-bottom: 20px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .field {
+    gap: 6px;
+  }
+
+  .field input {
+    height: 43px;
+  }
+
+  .login-prompt {
+    margin-top: 18px;
   }
 }
 
