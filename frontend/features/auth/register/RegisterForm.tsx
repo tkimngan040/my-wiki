@@ -81,7 +81,7 @@ export default function RegisterForm() {
           <span className="brand-mark" aria-hidden="true">
             M
           </span>
-          <span>Mywiki</span>
+          <span>MyWiki</span>
         </Link>
 
         <div className="intro-copy">

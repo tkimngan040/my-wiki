@@ -48,7 +48,7 @@ export default function LoginForm() {
         return;
       }
 
-      router.push("/login/success");
+      router.push("/");
     } catch {
       setFormError("Không gửi được yêu cầu. Hãy kiểm tra kết nối rồi thử lại.");
     } finally {
@@ -63,7 +63,7 @@ export default function LoginForm() {
           <span className="brand-mark" aria-hidden="true">
             M
           </span>
-          <span>Mywiki</span>
+          <span>MyWiki</span>
         </Link>
 
         <div className="intro-copy">

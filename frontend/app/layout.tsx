@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tạo tài khoản | MyWiki",
-  description: "Đăng ký tài khoản MyWiki để bắt đầu xây dựng thế giới của bạn.",
+  title: "MyWiki",
+  description:
+    "Không gian để tổ chức ý tưởng, xây dựng thế giới và kết nối những câu chuyện của bạn.",
 };
 
 export default function RootLayout({
