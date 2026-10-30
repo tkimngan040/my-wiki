@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useStoredTheme } from "@/features/theme/useStoredTheme";
 import {
   validateLoginForm,
   type LoginFieldErrors,
@@ -10,6 +11,7 @@ import {
 
 export default function LoginForm() {
   const router = useRouter();
+  const theme = useStoredTheme();
   const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,7 +59,7 @@ export default function LoginForm() {
   }
 
   return (
-    <main className="page-shell">
+    <main className="page-shell" data-theme={theme}>
       <section className="intro-panel" aria-label="Giới thiệu MyWiki">
         <Link className="brand" href="/" aria-label="MyWiki trang chủ">
           <span className="brand-mark" aria-hidden="true">

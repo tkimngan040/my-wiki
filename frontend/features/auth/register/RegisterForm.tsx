@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useStoredTheme } from "@/features/theme/useStoredTheme";
 import { validateForm, type FieldErrors } from "./validation";
 
 type RegisterResponse = {
@@ -11,6 +12,7 @@ type RegisterResponse = {
 };
 
 export default function RegisterForm() {
+  const theme = useStoredTheme();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -75,7 +77,7 @@ export default function RegisterForm() {
   }
 
   return (
-    <main className="page-shell">
+    <main className="page-shell" data-theme={theme}>
       <section className="intro-panel" aria-label="Giới thiệu MyWiki">
         <Link className="brand" href="/" aria-label="MyWiki trang chủ">
           <span className="brand-mark" aria-hidden="true">
@@ -179,16 +181,12 @@ export default function RegisterForm() {
                   minLength={6}
                   aria-invalid={Boolean(fieldErrors.password)}
                   aria-describedby={
-                    fieldErrors.password ? "password-error" : "password-hint"
+                    fieldErrors.password ? "password-error" : undefined
                   }
                 />
-                {fieldErrors.password ? (
+                {fieldErrors.password && (
                   <small className="field-error" id="password-error">
                     {fieldErrors.password}
-                  </small>
-                ) : (
-                  <small className="field-hint" id="password-hint">
-                    Dùng ít nhất 6 ký tự.
                   </small>
                 )}
               </label>

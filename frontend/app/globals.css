@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap");
+
+html,
+body {
+  font-family: "Nunito Sans";
+}
+
+html[data-theme="dark"] body {
+  background: #171d19;
+  color: #e8ede7;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

@@ -112,31 +112,6 @@ function saveTheme(theme: "light" | "dark") {
   window.dispatchEvent(new Event("mywiki-theme-change"));
 }
 
-function subscribeToSidebarState(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener("mywiki-sidebar-change", onChange);
-  return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener("mywiki-sidebar-change", onChange);
-  };
-}
-
-function getSidebarSnapshot(side: "left" | "right"): "true" | "false" {
-  if (typeof window === "undefined") return "false";
-  return window.localStorage.getItem(`mywiki-${side}-sidebar-collapsed`) === "true"
-    ? "true"
-    : "false";
-}
-
-function getServerSidebarSnapshot(): "false" {
-  return "false";
-}
-
-function saveSidebarState(side: "left" | "right", collapsed: boolean) {
-  window.localStorage.setItem(`mywiki-${side}-sidebar-collapsed`, String(collapsed));
-  window.dispatchEvent(new Event("mywiki-sidebar-change"));
-}
-
 const featureList = [
   {
     icon: "layers" as const,
@@ -330,10 +305,7 @@ export default function PublicHome() {
   const [showAllWorkspaces, setShowAllWorkspaces] = useState(false);
   const [signedInProfile, setSignedInProfile] =
     useState<SignedInProfile | null>(null);
-  const leftCollapsed =
-    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("left"), getServerSidebarSnapshot) === "true";
-  const rightCollapsed =
-    useSyncExternalStore(subscribeToSidebarState, () => getSidebarSnapshot("right"), getServerSidebarSnapshot) === "true";
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [accountError, setAccountError] = useState("");
   const [scope, setScope] = useState<SearchScope>("Tất cả");
   const [scopeOpen, setScopeOpen] = useState(false);
@@ -475,6 +447,7 @@ export default function PublicHome() {
         return;
       }
       setSignedInProfile(null);
+      setProfileMenuOpen(false);
     } catch {
       setAccountError("Không thể kết nối để đăng xuất. Vui lòng thử lại.");
     }
@@ -614,8 +587,136 @@ export default function PublicHome() {
         .filter((group) => group.results.length > 0)
     : [];
 
+  const searchPanel = (
+    <section className="search-section" ref={searchSection} aria-label="Tìm kiếm công khai">
+      <form className="search-form" role="search" onSubmit={handleSearch}>
+        <label className="search-input-wrap">
+          <Icon name="search" size={19} />
+          <input
+            ref={searchInput}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Tìm kiếm Workspace, Folder, Page..."
+            aria-label="Tìm kiếm Workspace, Folder, Page"
+          />
+          {query && (
+            <button
+              type="button"
+              className="clear-search"
+              aria-label="Xóa nội dung tìm kiếm"
+              onClick={() => {
+                setQuery("");
+                setSearchResults(null);
+                setSearchError("");
+              }}
+            >
+              <Icon name="close" size={15} />
+            </button>
+          )}
+        </label>
+        <div className="search-scope-wrap">
+          <button
+            type="button"
+            className="search-scope"
+            aria-expanded={scopeOpen}
+            aria-haspopup="listbox"
+            onClick={() => setScopeOpen((open) => !open)}
+          >
+            {scope}<span className="scope-chevron">⌄</span>
+          </button>
+          {scopeOpen && (
+            <div className="scope-menu" role="listbox" aria-label="Phạm vi tìm kiếm">
+              {scopes.map((item) => (
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={scope === item}
+                  className={scope === item ? "scope-option selected" : "scope-option"}
+                  key={item}
+                  onClick={() => {
+                    setScope(item);
+                    setScopeOpen(false);
+                  }}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="search-submit" type="submit" aria-label="Tìm kiếm" disabled={searchLoading}>
+          <Icon name="search" size={19} />
+        </button>
+      </form>
+
+      {searchLoading && (
+        <div className="search-feedback" role="status">Đang tìm trong các Workspace công khai...</div>
+      )}
+      {searchError && (
+        <div className="search-feedback error-feedback" role="alert">
+          {searchError}
+          <button type="button" onClick={() => void runSearch()}>
+            Thử lại
+          </button>
+        </div>
+      )}
+      {searchResults && !searchLoading && (
+        <section className="search-results-panel" aria-live="polite">
+          <div className="results-heading">
+            <div>
+              <span className="section-kicker">KẾT QUẢ TÌM KIẾM</span>
+              <h2>“{query.trim()}”</h2>
+            </div>
+            <button type="button" className="close-results" onClick={() => setSearchResults(null)}>
+              Đóng <Icon name="close" size={15} />
+            </button>
+          </div>
+          {searchResults.length === 0 ? (
+            <div className="no-results">
+              <span className="empty-icon"><Icon name="search" size={22} /></span>
+              <strong>Không tìm thấy dữ liệu phù hợp</strong>
+              <p>Thử từ khóa khác hoặc chọn phạm vi tìm kiếm khác nhé.</p>
+            </div>
+          ) : (
+            <div className="search-result-groups">
+              {groupedResults.map((group) => (
+                <section className="result-group" key={group.kind}>
+                  <h3>{group.kind}<span>{group.results.length}</span></h3>
+                  {group.results.map((result) => (
+                    <button
+                      className="result-row"
+                      type="button"
+                      key={`${result.kind}-${result.id}-${result.workspaceId ?? ""}`}
+                      onClick={() => {
+                        const workspace = workspaces.find(
+                          (item) =>
+                            item.workspaceId ===
+                            (result.kind === "Workspace"
+                              ? result.id
+                              : result.workspaceId),
+                        );
+                        if (workspace) void openWorkspace(workspace);
+                      }}
+                    >
+                      <span className="result-icon"><Icon name={result.kind === "Workspace" ? "globe" : result.kind === "Folder" ? "folder" : "file"} size={17} /></span>
+                      <span className="result-copy">
+                        <strong>{result.title}</strong>
+                        <small>{result.workspaceName ? `${result.workspaceName} · ` : ""}{result.description}</small>
+                      </span>
+                      <Icon name="chevron" size={16} />
+                    </button>
+                  ))}
+                </section>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+    </section>
+  );
+
   return (
-    <div className={`public-home${leftCollapsed ? " left-collapsed" : ""}${rightCollapsed ? " right-collapsed" : ""}`} data-theme={theme}>
+    <div className={`public-home guest-home${signedInProfile ? " signed-in-home" : ""}`} data-theme={theme}>
       <aside className="left-sidebar">
         <Link className="app-logo" href="/" aria-label="MyWiki trang chủ">
           <span className="logo-icon"><Icon name="book" size={20} /></span>
@@ -637,6 +738,15 @@ export default function PublicHome() {
           </button>
           <button className="nav-item" type="button" onClick={focusSearch}>
             <Icon name="search" /> <span>Tìm kiếm</span>
+          </button>
+          <button
+            className="nav-item theme-nav-item"
+            type="button"
+            aria-label={theme === "light" ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng"}
+            onClick={() => saveTheme(theme === "light" ? "dark" : "light")}
+          >
+            <Icon name={theme === "light" ? "moon" : "sun"} />
+            <span>{theme === "light" ? "Chế độ tối" : "Chế độ sáng"}</span>
           </button>
 
           <div className="nav-group">
@@ -692,154 +802,55 @@ export default function PublicHome() {
       </aside>
 
       <main className="main-content">
-        <header className="home-topbar">
-          <div className="home-top-title">
-            <button className="home-panel-button" type="button" aria-label={leftCollapsed ? "Mở thanh bên trái" : "Thu gọn thanh bên trái"} aria-expanded={!leftCollapsed} onClick={() => {
-              saveSidebarState("left", !leftCollapsed);
-            }}><Icon name="sidebar-left" size={17} /></button>
-            <strong>MYWIKI WORKSPACE</strong>
-          </div>
-          <div className="home-top-actions">
-            <button className="home-panel-button" type="button" aria-label={rightCollapsed ? "Mở thanh bên phải" : "Thu gọn thanh bên phải"} aria-expanded={!rightCollapsed} onClick={() => {
-              saveSidebarState("right", !rightCollapsed);
-            }}><Icon name="sidebar-right" size={17} /></button>
-            <button className="home-theme-button" type="button" aria-label={theme === "light" ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng"} onClick={() => saveTheme(theme === "light" ? "dark" : "light")}>
-              <Icon name={theme === "light" ? "moon" : "sun"} size={17} />
-            </button>
-          </div>
-        </header>
-        <section className="search-section" ref={searchSection} aria-label="Tìm kiếm công khai">
-          <form className="search-form" role="search" onSubmit={handleSearch}>
-            <label className="search-input-wrap">
-              <Icon name="search" size={19} />
-              <input
-                ref={searchInput}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Tìm kiếm Workspace, Folder, Page..."
-                aria-label="Tìm kiếm Workspace, Folder, Page"
-              />
-              {query && (
-                <button
-                  type="button"
-                  className="clear-search"
-                  aria-label="Xóa nội dung tìm kiếm"
-                  onClick={() => {
-                    setQuery("");
-                    setSearchResults(null);
-                    setSearchError("");
-                  }}
-                >
-                  <Icon name="close" size={15} />
-                </button>
-              )}
-            </label>
-            <div className="search-scope-wrap">
+        <header className="home-topbar guest-topbar">
+          {searchPanel}
+          {signedInProfile ? (
+            <div className="account-menu-wrap">
               <button
+                className="account-profile-button"
                 type="button"
-                className="search-scope"
-                aria-expanded={scopeOpen}
-                aria-haspopup="listbox"
-                onClick={() => setScopeOpen((open) => !open)}
+                aria-expanded={profileMenuOpen}
+                aria-haspopup="true"
+                onClick={() => setProfileMenuOpen((open) => !open)}
               >
-                {scope}<span className="scope-chevron">⌄</span>
+                <span className="account-avatar">
+                  {signedInProfile.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={signedInProfile.avatarUrl} alt="" />
+                  ) : (
+                    signedInProfile.username.slice(0, 1).toLocaleUpperCase("vi")
+                  )}
+                </span>
+                <span className="account-profile-name">{signedInProfile.username}</span>
               </button>
-              {scopeOpen && (
-                <div className="scope-menu" role="listbox" aria-label="Phạm vi tìm kiếm">
-                  {scopes.map((item) => (
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={scope === item}
-                      className={scope === item ? "scope-option selected" : "scope-option"}
-                      key={item}
-                      onClick={() => {
-                        setScope(item);
-                        setScopeOpen(false);
-                      }}
-                    >
-                      {item}
-                    </button>
-                  ))}
+              {profileMenuOpen && (
+                <div className="account-profile-menu">
+                  {accountError && <p className="account-menu-error" role="alert">{accountError}</p>}
+                  <button
+                    className="account-menu-item"
+                    type="button"
+                    onClick={() => void handleLogout()}
+                  >
+                    <Icon name="close" size={16} />
+                    Đăng xuất
+                  </button>
                 </div>
               )}
             </div>
-            <button className="search-submit" type="submit" aria-label="Tìm kiếm" disabled={searchLoading}>
-              <Icon name="search" size={19} />
-            </button>
-          </form>
-
-          {searchLoading && (
-            <div className="search-feedback" role="status">Đang tìm trong các Workspace công khai...</div>
-          )}
-          {searchError && (
-            <div className="search-feedback error-feedback" role="alert">
-              {searchError}
-              <button type="button" onClick={() => void runSearch()}>
-                Thử lại
-              </button>
+          ) : (
+            <div className="guest-auth-actions">
+              <Link className="guest-login-button" href="/login">Đăng nhập</Link>
+              <Link className="guest-register-button" href="/register">Đăng ký</Link>
             </div>
           )}
-          {searchResults && !searchLoading && (
-            <section className="search-results-panel" aria-live="polite">
-              <div className="results-heading">
-                <div>
-                  <span className="section-kicker">KẾT QUẢ TÌM KIẾM</span>
-                  <h2>“{query.trim()}”</h2>
-                </div>
-                <button type="button" className="close-results" onClick={() => setSearchResults(null)}>
-                  Đóng <Icon name="close" size={15} />
-                </button>
-              </div>
-              {searchResults.length === 0 ? (
-                <div className="no-results">
-                  <span className="empty-icon"><Icon name="search" size={22} /></span>
-                  <strong>Không tìm thấy dữ liệu phù hợp</strong>
-                  <p>Thử từ khóa khác hoặc chọn phạm vi tìm kiếm khác nhé.</p>
-                </div>
-              ) : (
-                <div className="search-result-groups">
-                  {groupedResults.map((group) => (
-                    <section className="result-group" key={group.kind}>
-                      <h3>{group.kind}<span>{group.results.length}</span></h3>
-                      {group.results.map((result) => (
-                        <button
-                          className="result-row"
-                          type="button"
-                          key={`${result.kind}-${result.id}-${result.workspaceId ?? ""}`}
-                          onClick={() => {
-                            const workspace = workspaces.find(
-                              (item) =>
-                                item.workspaceId ===
-                                (result.kind === "Workspace"
-                                  ? result.id
-                                  : result.workspaceId),
-                            );
-                            if (workspace) void openWorkspace(workspace);
-                          }}
-                        >
-                          <span className="result-icon"><Icon name={result.kind === "Workspace" ? "globe" : result.kind === "Folder" ? "folder" : "file"} size={17} /></span>
-                          <span className="result-copy">
-                            <strong>{result.title}</strong>
-                            <small>{result.workspaceName ? `${result.workspaceName} · ` : ""}{result.description}</small>
-                          </span>
-                          <Icon name="chevron" size={16} />
-                        </button>
-                      ))}
-                    </section>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-        </section>
+        </header>
 
         <section className="hero-banner">
           <Landscape />
           <div className="hero-shade" />
           <div className="hero-content">
             <span className="hero-badge"><Icon name="sparkles" size={14} /> KHÔNG GIAN TRI THỨC CỦA BẠN</span>
-            <h1>Khám phá tri thức,<br />kết nối ý tưởng</h1>
+            <h1>Khám phá tri thức, kết nối ý tưởng</h1>
             <p>MyWiki là không gian lưu trữ và tổ chức tri thức cá nhân của bạn.</p>
             <div className="hero-tags">
               <span><Icon name="lightbulb" size={14} /> Lưu trữ ý tưởng</span>
@@ -851,7 +862,7 @@ export default function PublicHome() {
           <span className="hero-caption">Mỗi ý tưởng đều có thể trở thành một thế giới.</span>
         </section>
 
-        <section className="public-workspaces" ref={publicSection}>
+        <section className="public-workspaces" id="public-workspaces" ref={publicSection}>
           <div className="section-heading">
             <div className="section-heading-copy">
               <div className="section-title-row">
@@ -914,7 +925,7 @@ export default function PublicHome() {
           )}
         </section>
 
-        <section className="bottom-cta">
+        <section className={`bottom-cta${signedInProfile ? "" : " guest-bottom-cta"}`}>
           <span className="bottom-cta-icon"><Icon name="lightbulb" size={21} /></span>
           <div className="bottom-cta-copy">
             <h2>{signedInProfile ? `Chào ${signedInProfile.username}, tiếp tục sáng tạo nhé!` : "Bạn muốn tạo Workspace riêng?"}</h2>
